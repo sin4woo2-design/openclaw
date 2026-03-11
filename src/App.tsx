@@ -177,6 +177,7 @@ export default function App() {
   const [onboardingName, setOnboardingName] = useState(state.userName || "");
   const [onboardingGoal, setOnboardingGoal] = useState(state.focusGoal || "");
   const [statsRange, setStatsRange] = useState<"7d" | "14d" | "30d">("14d");
+  const [burst, setBurst] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -187,6 +188,12 @@ export default function App() {
     const t = window.setTimeout(() => setToast(null), 1400);
     return () => clearTimeout(t);
   }, [toast]);
+
+  useEffect(() => {
+    if (!burst) return;
+    const t = window.setTimeout(() => setBurst(false), 700);
+    return () => clearTimeout(t);
+  }, [burst]);
 
   useEffect(() => {
     const today = nowDate();
@@ -270,6 +277,7 @@ export default function App() {
     }));
 
     setToast("체크 완료 +XP");
+    setBurst(true);
     setMessage("좋아. 한 칸 채웠다. 시작이 반!");
   };
 
@@ -477,49 +485,51 @@ export default function App() {
       <div key={tab} className="tabStage">
       {tab === "today" && (
         <main className="stack">
-          <section className="card">
-            <div className="titleRow"><h2>오늘 해야 할 습관</h2><span>{doneToday}/{activeHabits.length}</span></div>
-            <div className="habitList">
-              {activeHabits.length === 0 ? (
-                <article className="emptyState">
-                  <strong>오늘 활성 습관이 없어요</strong>
-                  <p>아래에서 습관을 추가하거나 템플릿을 선택해 시작해보세요.</p>
-                </article>
-              ) : null}
-              {activeHabits.map((h) => (
-                <article key={h.id} className={`habitItem ${h.todayDone ? "done" : ""}`}>
-                  <div>
-                    <div className="habitTitleRow">
-                      <strong>{h.name}</strong>
-                      <span className="difficultyPill">{difficultyLabel[h.difficulty]}</span>
+          <section className="todayGrid">
+            <section className="card">
+              <div className="titleRow"><h2>오늘 해야 할 습관</h2><span>{doneToday}/{activeHabits.length}</span></div>
+              <div className="habitList">
+                {activeHabits.length === 0 ? (
+                  <article className="emptyState">
+                    <strong>오늘 활성 습관이 없어요</strong>
+                    <p>아래에서 습관을 추가하거나 템플릿을 선택해 시작해보세요.</p>
+                  </article>
+                ) : null}
+                {activeHabits.map((h) => (
+                  <article key={h.id} className={`habitItem ${h.todayDone ? "done" : ""}`}>
+                    <div>
+                      <div className="habitTitleRow">
+                        <strong>{h.name}</strong>
+                        <span className="difficultyPill">{difficultyLabel[h.difficulty]}</span>
+                      </div>
+                      <p>{h.category} · 연속 {h.streak}일 · 최고 {h.bestStreak}일</p>
                     </div>
-                    <p>{h.category} · 연속 {h.streak}일 · 최고 {h.bestStreak}일</p>
-                  </div>
-                  <div className="actions">
-                    <button className="primary" onClick={() => doHabit(h.id)}>{h.todayDone ? "체크 취소" : "완료 체크"}</button>
-                    <button onClick={() => failHabit(h.id)}>실패</button>
-                    <button className="soft" onClick={() => recoverByToken(h.id)}>토큰 방어</button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </section>
+                    <div className="actions">
+                      <button className="primary" onClick={() => doHabit(h.id)}>{h.todayDone ? "체크 취소" : "완료 체크"}</button>
+                      <button onClick={() => failHabit(h.id)}>실패</button>
+                      <button className="soft" onClick={() => recoverByToken(h.id)}>토큰 방어</button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
 
-          <section className="card">
-            <h2>습관 빠르게 추가</h2>
-            <div className="formRow">
-              <input placeholder="예: 10분 스트레칭" value={newHabitName} onChange={(e) => setNewHabitName(e.target.value)} />
-              <select value={newCategory} onChange={(e) => setNewCategory(e.target.value as HabitCategory)}>
-                <option>건강</option><option>집중</option><option>마음</option><option>생활</option>
-              </select>
-              <select value={newDifficulty} onChange={(e) => setNewDifficulty(e.target.value as Difficulty)}>
-                <option value="easy">easy</option><option value="normal">normal</option><option value="hard">hard</option>
-              </select>
-              <button className="primary" onClick={addHabit}>추가</button>
-            </div>
-            <div className="chips">
-              {templates.map((t) => <button key={t.name} className="chip" onClick={() => addTemplate(t)}>{t.name}</button>)}
-            </div>
+            <section className="card">
+              <h2>습관 빠르게 추가</h2>
+              <div className="formRow">
+                <input placeholder="예: 10분 스트레칭" value={newHabitName} onChange={(e) => setNewHabitName(e.target.value)} />
+                <select value={newCategory} onChange={(e) => setNewCategory(e.target.value as HabitCategory)}>
+                  <option>건강</option><option>집중</option><option>마음</option><option>생활</option>
+                </select>
+                <select value={newDifficulty} onChange={(e) => setNewDifficulty(e.target.value as Difficulty)}>
+                  <option value="easy">easy</option><option value="normal">normal</option><option value="hard">hard</option>
+                </select>
+                <button className="primary" onClick={addHabit}>추가</button>
+              </div>
+              <div className="chips">
+                {templates.map((t) => <button key={t.name} className="chip" onClick={() => addTemplate(t)}>{t.name}</button>)}
+              </div>
+            </section>
           </section>
 
           {game && (
@@ -682,6 +692,8 @@ export default function App() {
         </main>
       )}
       </div>
+
+      {burst ? <div className="burst" aria-hidden><i /><i /><i /><i /><i /><i /></div> : null}
 
       <nav className="bottomDock">
         {[
