@@ -424,7 +424,13 @@ export default function App() {
   return (
     <div className="app">
       <header className="brandBar card">
-        <p className="eyebrow">START IS HALF · 시작이 반</p>
+        <div className="brandIdentity">
+          <span className="brandCoin">半</span>
+          <div>
+            <p className="eyebrow">START IS HALF · 시작이 반</p>
+            <small>"시작하는 순간 절반은 이미 끝났다"</small>
+          </div>
+        </div>
         <div className="brandBarRow">
           <strong>Lv.{level}</strong>
           <span>모멘텀 {state.momentumDays}일 · 토큰 {state.freezeTokens}개</span>
@@ -464,7 +470,7 @@ export default function App() {
             <input value={onboardingName} onChange={(e) => setOnboardingName(e.target.value)} placeholder="이름 또는 닉네임" />
             <input value={onboardingGoal} onChange={(e) => setOnboardingGoal(e.target.value)} placeholder="이번 주 핵심 목표 (예: 체중 -1kg)" />
           </div>
-          <button className="primary" onClick={completeOnboarding}>시작하기</button>
+          <div className="centerAction"><button className="primary" onClick={completeOnboarding}>시작하기</button></div>
         </section>
       ) : null}
 

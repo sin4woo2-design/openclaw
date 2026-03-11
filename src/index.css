@@ -1,7 +1,17 @@
 :root {
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface-soft: #fcfdff;
+  --text: #1b2434;
+  --muted: #60708e;
+  --brand-1: #4f79dd;
+  --brand-2: #263f70;
+  --brand-soft: #edf3ff;
+  --line: #e4e9f3;
+  --success-soft: #edf8f1;
   font-family: Inter, "Pretendard", system-ui, sans-serif;
-  color: #1b2434;
-  background: #f4f6fb;
+  color: var(--text);
+  background: var(--bg);
 }
 
 * { box-sizing: border-box; }
@@ -28,8 +38,8 @@ button, input, select { font: inherit; }
 }
 
 .card {
-  background: linear-gradient(180deg, #ffffff, #fcfdff);
-  border: 1px solid #e4e9f3;
+  background: linear-gradient(180deg, var(--surface), var(--surface-soft));
+  border: 1px solid var(--line);
   border-radius: 18px;
   padding: 14px;
   box-shadow: 0 8px 22px rgba(24, 39, 75, 0.06);
@@ -42,6 +52,29 @@ button, input, select { font: inherit; }
   top: 8px;
   z-index: 10;
   backdrop-filter: blur(8px);
+}
+
+.brandIdentity {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.brandCoin {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand-1), var(--brand-2));
+  box-shadow: 0 4px 10px rgba(47, 72, 133, 0.28);
+}
+
+.brandIdentity small {
+  color: var(--muted);
+  font-size: 11px;
 }
 
 .brandBarRow {
@@ -218,18 +251,36 @@ h2 { margin: 0; font-size: 19px; color: #1c2740; }
   padding: 4px 8px;
 }
 
-.actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.centerAction {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
 button {
   border: 1px solid #d4deef;
   background: #fff;
   border-radius: 10px;
   padding: 8px 10px;
   color: #2f3d58;
+  transition: transform .16s ease, box-shadow .16s ease;
 }
 
-button.primary { background: #4f79dd; border-color: #4f79dd; color: #fff; }
-button.soft { background: #edf8f1; border-color: #bfe3cc; color: #236744; }
-button.active { background: #e9f0ff; border-color: #c6d6f8; color: #3058a8; }
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(36, 56, 94, 0.12);
+}
+
+button.primary { background: linear-gradient(135deg, var(--brand-1), var(--brand-2)); border-color: var(--brand-2); color: #fff; }
+button.soft { background: var(--success-soft); border-color: #bfe3cc; color: #236744; }
+button.active { background: var(--brand-soft); border-color: #c6d6f8; color: #3058a8; }
 
 .formRow {
   display: grid;
@@ -416,7 +467,7 @@ input, select {
 
 .dockBtn.active {
   color: #1f376a;
-  background: #edf3ff;
+  background: linear-gradient(135deg, #edf3ff, #e4edff);
   font-weight: 700;
 }
 
