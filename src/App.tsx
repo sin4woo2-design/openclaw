@@ -176,6 +176,7 @@ export default function App() {
   const [toast, setToast] = useState<string | null>(null);
   const [onboardingName, setOnboardingName] = useState(state.userName || "");
   const [onboardingGoal, setOnboardingGoal] = useState(state.focusGoal || "");
+  const [statsRange, setStatsRange] = useState<"7d" | "14d" | "30d">("14d");
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -231,7 +232,8 @@ export default function App() {
   const level = Math.floor(state.levelPoint / 100) + 1;
 
   const weekBars = useMemo(() => {
-    const logs = state.dayLogs.slice(0, 21);
+    const take = statsRange === "7d" ? 7 : statsRange === "14d" ? 14 : 30;
+    const logs = state.dayLogs.slice(0, take);
     return ["일", "월", "화", "수", "목", "금", "토"].map((day, idx) => {
       const arr = logs
         .filter((x) => new Date(x.date).getDay() === idx)
@@ -239,7 +241,7 @@ export default function App() {
       const val = arr.length ? Math.round((arr.reduce((a, b) => a + b, 0) / arr.length) * 100) : 0;
       return { day, val };
     });
-  }, [state.dayLogs]);
+  }, [state.dayLogs, statsRange]);
 
   const bestDay = [...weekBars].sort((a, b) => b.val - a.val)[0];
   const weakDay = [...weekBars].sort((a, b) => a.val - b.val)[0];
@@ -541,18 +543,31 @@ export default function App() {
       {tab === "stats" && (
         <main className="stack">
           <section className="kpiGrid">
-            <article className="card"><span>평균 스트릭</span><strong>{avgStreak}일</strong></article>
-            <article className="card"><span>누적 완료</span><strong>{totalDone}회</strong></article>
-            <article className="card"><span>최강 습관</span><strong>{topHabit ? topHabit.name : "-"}</strong></article>
+            <article className="card statCard"><span>평균 스트릭</span><strong>{avgStreak}일</strong></article>
+            <article className="card statCard"><span>누적 완료</span><strong>{totalDone}회</strong></article>
+            <article className="card statCard"><span>최강 습관</span><strong>{topHabit ? topHabit.name : "-"}</strong></article>
           </section>
 
           <section className="card">
-            <h2>요일별 성공률</h2>
+            <div className="sectionTop">
+              <h2>요일별 성공률</h2>
+              <div className="rangeChips">
+                {(["7d", "14d", "30d"] as const).map((r) => (
+                  <button key={r} className={statsRange === r ? "active" : ""} onClick={() => setStatsRange(r)}>{r}</button>
+                ))}
+              </div>
+            </div>
             <div className="chart">
               {weekBars.map((b) => (
                 <div key={b.day} className="barWrap"><i style={{ height: `${Math.max(14, b.val * 1.4)}px` }} /><strong>{b.val}%</strong><span>{b.day}</span></div>
               ))}
             </div>
+          </section>
+
+          <section className="card trendRail">
+            <article><small>리듬 안정도</small><strong>{Math.max(0, Math.min(100, Math.round((bestDay?.val ?? 0) - (weakDay?.val ?? 0) + 55)))}점</strong></article>
+            <article><small>성장 여지</small><strong>{Math.max(0, 100 - (bestDay?.val ?? 0))}%</strong></article>
+            <article><small>추천 루틴</small><strong>{(weakDay?.val ?? 0) < 40 ? "2분 습관" : "난이도 상향"}</strong></article>
           </section>
 
           <section className="card insightGrid">
@@ -576,19 +591,30 @@ export default function App() {
             <h2>챌린지</h2>
             <div className="challengeList">
               {state.challenges.map((c) => (
-                <article key={c.id} className="challengeItem">
+                <article key={c.id} className="challengeItem premiumChallenge">
                   <div>
-                    <strong>{c.title}</strong>
+                    <div className="challengeTopRow">
+                      <strong>{c.title}</strong>
+                      <span>{c.days}D</span>
+                    </div>
                     <p>{c.description}</p>
-                    <small>{c.days}일 · {c.participants}명 참여</small>
+                    <small>{c.participants}명 참여 · 이번 주 완주율 예상 {Math.min(92, 48 + c.participants % 44)}%</small>
+                    <div className="tagRow">{c.tags.map((t) => <em key={t}>#{t}</em>)}</div>
                   </div>
                   <button className={c.joined ? "active" : ""} onClick={() => setState((prev) => ({
                     ...prev,
                     challenges: prev.challenges.map((x) => x.id === c.id ? { ...x, joined: !x.joined, participants: x.joined ? x.participants - 1 : x.participants + 1 } : x),
-                  }))}>{c.joined ? "참여중" : "참여"}</button>
+                  }))}>{c.joined ? "참여중" : "같이 도전"}</button>
                 </article>
               ))}
             </div>
+          </section>
+
+          <section className="card communityFeed">
+            <h2>실시간 피드</h2>
+            <div className="feedItem"><b>민지</b><p>아침 스트레칭 12일째 · "출근 전에 2분만!"</p></div>
+            <div className="feedItem"><b>준호</b><p>독서 15분 9일째 · "점심 후가 가장 잘됨"</p></div>
+            <div className="feedItem"><b>유나</b><p>물 8잔 20일째 · "컵을 눈에 보이게 두니까 성공"</p></div>
           </section>
         </main>
       )}
