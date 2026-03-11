@@ -1,85 +1,93 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="144" height="24" viewBox="0 0 144 24" shape-rendering="crispEdges">
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="128" viewBox="0 0 768 128" shape-rendering="crispEdges">
   <defs>
     <style>
-      .o{fill:#2b1e1a}.b{fill:#c98a52}.m{fill:#e9b67a}.c{fill:#f6d5ab}.p{fill:#f08aa8}.e{fill:#1b1417}
+      .o{fill:#3a251d}.d{fill:#8b5b3b}.m{fill:#d59a62}.l{fill:#f2c48d}.c{fill:#ffd7ac}.p{fill:#f08cae}.e{fill:#1f1720}
     </style>
   </defs>
+  <rect width="768" height="128" fill="#0000"/>
 
-  <!-- frame 1 idle -->
-  <g transform="translate(0 0)">
-    <rect x="8" y="3" width="3" height="3" class="o"/><rect x="13" y="3" width="3" height="3" class="o"/>
-    <rect x="8" y="4" width="2" height="2" class="b"/><rect x="14" y="4" width="2" height="2" class="b"/>
-    <rect x="6" y="6" width="12" height="11" class="o"/>
-    <rect x="7" y="7" width="10" height="9" class="m"/>
-    <rect x="8" y="8" width="8" height="7" class="c"/>
-    <rect x="8" y="10" width="2" height="2" class="p"/><rect x="14" y="10" width="2" height="2" class="p"/>
-    <rect x="10" y="9" width="1" height="1" class="e"/><rect x="13" y="9" width="1" height="1" class="e"/>
-    <rect x="11" y="11" width="2" height="1" class="e"/>
-    <rect x="9" y="17" width="2" height="2" class="o"/><rect x="13" y="17" width="2" height="2" class="o"/>
+  <!-- Helper: each frame 128x128, hamster centered at ~64,70 -->
+  <g id="f1" transform="translate(0 0)">
+    <rect x="36" y="24" width="20" height="20" class="o"/><rect x="72" y="24" width="20" height="20" class="o"/>
+    <rect x="40" y="28" width="12" height="12" class="d"/><rect x="76" y="28" width="12" height="12" class="d"/>
+    <rect x="24" y="40" width="80" height="56" class="o"/>
+    <rect x="28" y="44" width="72" height="48" class="m"/>
+    <rect x="32" y="48" width="64" height="40" class="l"/>
+    <rect x="36" y="52" width="56" height="32" class="c"/>
+    <rect x="34" y="60" width="10" height="12" class="p"/><rect x="84" y="60" width="10" height="12" class="p"/>
+    <rect x="48" y="56" width="8" height="8" class="e"/><rect x="72" y="56" width="8" height="8" class="e"/>
+    <rect x="58" y="68" width="12" height="6" class="e"/>
+    <rect x="40" y="96" width="20" height="16" class="d"/><rect x="68" y="96" width="20" height="16" class="d"/>
+    <rect x="44" y="110" width="12" height="6" class="o"/><rect x="72" y="110" width="12" height="6" class="o"/>
   </g>
 
-  <!-- frame 2 blink -->
-  <g transform="translate(24 0)">
-    <rect x="8" y="3" width="3" height="3" class="o"/><rect x="13" y="3" width="3" height="3" class="o"/>
-    <rect x="8" y="4" width="2" height="2" class="b"/><rect x="14" y="4" width="2" height="2" class="b"/>
-    <rect x="6" y="7" width="12" height="11" class="o"/>
-    <rect x="7" y="8" width="10" height="9" class="m"/>
-    <rect x="8" y="9" width="8" height="7" class="c"/>
-    <rect x="8" y="11" width="2" height="2" class="p"/><rect x="14" y="11" width="2" height="2" class="p"/>
-    <rect x="10" y="10" width="1" height="1" class="e"/><rect x="13" y="10" width="1" height="1" class="e"/>
-    <rect x="11" y="12" width="2" height="1" class="e"/>
-    <rect x="9" y="18" width="2" height="2" class="o"/><rect x="13" y="18" width="2" height="2" class="o"/>
+  <g id="f2" transform="translate(128 0)">
+    <rect x="36" y="26" width="20" height="20" class="o"/><rect x="72" y="26" width="20" height="20" class="o"/>
+    <rect x="40" y="30" width="12" height="12" class="d"/><rect x="76" y="30" width="12" height="12" class="d"/>
+    <rect x="24" y="42" width="80" height="56" class="o"/>
+    <rect x="28" y="46" width="72" height="48" class="m"/>
+    <rect x="32" y="50" width="64" height="40" class="l"/>
+    <rect x="36" y="54" width="56" height="32" class="c"/>
+    <rect x="34" y="62" width="10" height="12" class="p"/><rect x="84" y="62" width="10" height="12" class="p"/>
+    <rect x="48" y="60" width="8" height="3" class="e"/><rect x="72" y="60" width="8" height="3" class="e"/>
+    <rect x="58" y="70" width="12" height="6" class="e"/>
+    <rect x="40" y="98" width="20" height="16" class="d"/><rect x="68" y="98" width="20" height="16" class="d"/>
+    <rect x="44" y="112" width="12" height="6" class="o"/><rect x="72" y="112" width="12" height="6" class="o"/>
   </g>
 
-  <!-- frame 3 smile -->
-  <g transform="translate(48 0)">
-    <rect x="8" y="3" width="3" height="3" class="o"/><rect x="13" y="3" width="3" height="3" class="o"/>
-    <rect x="8" y="4" width="2" height="2" class="b"/><rect x="14" y="4" width="2" height="2" class="b"/>
-    <rect x="6" y="6" width="12" height="11" class="o"/>
-    <rect x="7" y="7" width="10" height="9" class="m"/>
-    <rect x="8" y="8" width="8" height="7" class="c"/>
-    <rect x="8" y="10" width="2" height="2" class="p"/><rect x="14" y="10" width="2" height="2" class="p"/>
-    <rect x="10" y="9" width="1" height="1" class="e"/><rect x="13" y="9" width="1" height="1" class="e"/>
-    <rect x="10" y="11" width="4" height="1" class="e"/>
-    <rect x="9" y="17" width="2" height="2" class="o"/><rect x="13" y="17" width="2" height="2" class="o"/>
+  <g id="f3" transform="translate(256 0)">
+    <rect x="36" y="24" width="20" height="20" class="o"/><rect x="72" y="24" width="20" height="20" class="o"/>
+    <rect x="40" y="28" width="12" height="12" class="d"/><rect x="76" y="28" width="12" height="12" class="d"/>
+    <rect x="24" y="40" width="80" height="56" class="o"/>
+    <rect x="28" y="44" width="72" height="48" class="m"/>
+    <rect x="32" y="48" width="64" height="40" class="l"/>
+    <rect x="36" y="52" width="56" height="32" class="c"/>
+    <rect x="34" y="60" width="10" height="12" class="p"/><rect x="84" y="60" width="10" height="12" class="p"/>
+    <rect x="48" y="56" width="8" height="8" class="e"/><rect x="72" y="56" width="8" height="8" class="e"/>
+    <rect x="54" y="68" width="20" height="6" class="e"/>
+    <rect x="40" y="96" width="20" height="16" class="d"/><rect x="68" y="96" width="20" height="16" class="d"/>
+    <rect x="44" y="110" width="12" height="6" class="o"/><rect x="72" y="110" width="12" height="6" class="o"/>
   </g>
 
-  <!-- frame 4 hop -->
-  <g transform="translate(72 0)">
-    <rect x="8" y="2" width="3" height="3" class="o"/><rect x="13" y="2" width="3" height="3" class="o"/>
-    <rect x="8" y="3" width="2" height="2" class="b"/><rect x="14" y="3" width="2" height="2" class="b"/>
-    <rect x="6" y="5" width="12" height="11" class="o"/>
-    <rect x="7" y="6" width="10" height="9" class="m"/>
-    <rect x="8" y="7" width="8" height="7" class="c"/>
-    <rect x="8" y="9" width="2" height="2" class="p"/><rect x="14" y="9" width="2" height="2" class="p"/>
-    <rect x="10" y="8" width="1" height="1" class="e"/><rect x="13" y="8" width="1" height="1" class="e"/>
-    <rect x="11" y="10" width="2" height="1" class="e"/>
-    <rect x="9" y="16" width="2" height="2" class="o"/><rect x="13" y="16" width="2" height="2" class="o"/>
+  <g id="f4" transform="translate(384 0)">
+    <rect x="36" y="18" width="20" height="20" class="o"/><rect x="72" y="18" width="20" height="20" class="o"/>
+    <rect x="40" y="22" width="12" height="12" class="d"/><rect x="76" y="22" width="12" height="12" class="d"/>
+    <rect x="24" y="34" width="80" height="56" class="o"/>
+    <rect x="28" y="38" width="72" height="48" class="m"/>
+    <rect x="32" y="42" width="64" height="40" class="l"/>
+    <rect x="36" y="46" width="56" height="32" class="c"/>
+    <rect x="34" y="54" width="10" height="12" class="p"/><rect x="84" y="54" width="10" height="12" class="p"/>
+    <rect x="48" y="50" width="8" height="8" class="e"/><rect x="72" y="50" width="8" height="8" class="e"/>
+    <rect x="58" y="62" width="12" height="6" class="e"/>
+    <rect x="40" y="90" width="20" height="16" class="d"/><rect x="68" y="90" width="20" height="16" class="d"/>
+    <rect x="44" y="104" width="12" height="6" class="o"/><rect x="72" y="104" width="12" height="6" class="o"/>
   </g>
 
-  <!-- frame 5 side-left -->
-  <g transform="translate(96 0)">
-    <rect x="8" y="3" width="3" height="3" class="o"/>
-    <rect x="8" y="4" width="2" height="2" class="b"/>
-    <rect x="6" y="6" width="12" height="11" class="o"/>
-    <rect x="7" y="7" width="10" height="9" class="m"/>
-    <rect x="8" y="8" width="8" height="7" class="c"/>
-    <rect x="8" y="10" width="2" height="2" class="p"/>
-    <rect x="11" y="9" width="1" height="1" class="e"/>
-    <rect x="12" y="11" width="2" height="1" class="e"/>
-    <rect x="9" y="17" width="2" height="2" class="o"/><rect x="13" y="17" width="2" height="2" class="o"/>
+  <g id="f5" transform="translate(512 0)">
+    <rect x="32" y="24" width="20" height="20" class="o"/>
+    <rect x="36" y="28" width="12" height="12" class="d"/>
+    <rect x="24" y="40" width="80" height="56" class="o"/>
+    <rect x="28" y="44" width="72" height="48" class="m"/>
+    <rect x="32" y="48" width="64" height="40" class="l"/>
+    <rect x="36" y="52" width="56" height="32" class="c"/>
+    <rect x="36" y="60" width="10" height="12" class="p"/>
+    <rect x="52" y="56" width="8" height="8" class="e"/>
+    <rect x="60" y="68" width="10" height="6" class="e"/>
+    <rect x="40" y="96" width="20" height="16" class="d"/><rect x="68" y="96" width="20" height="16" class="d"/>
+    <rect x="44" y="110" width="12" height="6" class="o"/><rect x="72" y="110" width="12" height="6" class="o"/>
   </g>
 
-  <!-- frame 6 side-right -->
-  <g transform="translate(120 0)">
-    <rect x="13" y="3" width="3" height="3" class="o"/>
-    <rect x="14" y="4" width="2" height="2" class="b"/>
-    <rect x="6" y="6" width="12" height="11" class="o"/>
-    <rect x="7" y="7" width="10" height="9" class="m"/>
-    <rect x="8" y="8" width="8" height="7" class="c"/>
-    <rect x="14" y="10" width="2" height="2" class="p"/>
-    <rect x="12" y="9" width="1" height="1" class="e"/>
-    <rect x="10" y="11" width="2" height="1" class="e"/>
-    <rect x="9" y="17" width="2" height="2" class="o"/><rect x="13" y="17" width="2" height="2" class="o"/>
+  <g id="f6" transform="translate(640 0)">
+    <rect x="76" y="24" width="20" height="20" class="o"/>
+    <rect x="80" y="28" width="12" height="12" class="d"/>
+    <rect x="24" y="40" width="80" height="56" class="o"/>
+    <rect x="28" y="44" width="72" height="48" class="m"/>
+    <rect x="32" y="48" width="64" height="40" class="l"/>
+    <rect x="36" y="52" width="56" height="32" class="c"/>
+    <rect x="82" y="60" width="10" height="12" class="p"/>
+    <rect x="68" y="56" width="8" height="8" class="e"/>
+    <rect x="58" y="68" width="10" height="6" class="e"/>
+    <rect x="40" y="96" width="20" height="16" class="d"/><rect x="68" y="96" width="20" height="16" class="d"/>
+    <rect x="44" y="110" width="12" height="6" class="o"/><rect x="72" y="110" width="12" height="6" class="o"/>
   </g>
 </svg>
