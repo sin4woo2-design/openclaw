@@ -52,6 +52,9 @@ type AppState = {
   dayLogs: DayLog[];
   lastOpenedDate: string;
   momentumDays: number;
+  onboardingDone: boolean;
+  userName: string;
+  focusGoal: string;
 };
 
 const STORAGE_KEY = "start-is-half-v4";
@@ -127,6 +130,9 @@ const initialState: AppState = {
   dayLogs: [],
   lastOpenedDate: nowDate(),
   momentumDays: 2,
+  onboardingDone: false,
+  userName: "",
+  focusGoal: "",
 };
 
 function loadState(): AppState {
@@ -168,6 +174,8 @@ export default function App() {
   const [message, setMessage] = useState("오늘도 한 칸, 시작하면 반은 했다.");
   const [game, setGame] = useState<RecoveryGame | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [onboardingName, setOnboardingName] = useState(state.userName || "");
+  const [onboardingGoal, setOnboardingGoal] = useState(state.focusGoal || "");
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -365,6 +373,20 @@ export default function App() {
 
   const joinedCount = state.challenges.filter((c) => c.joined).length;
 
+  const completeOnboarding = () => {
+    if (!onboardingName.trim() || !onboardingGoal.trim()) {
+      setMessage("이름과 목표를 입력하면 맞춤 동기부여가 시작돼요.");
+      return;
+    }
+    setState((prev) => ({
+      ...prev,
+      onboardingDone: true,
+      userName: onboardingName.trim(),
+      focusGoal: onboardingGoal.trim(),
+    }));
+    setToast("온보딩 완료");
+  };
+
   return (
     <div className="app">
       <header className="hero card">
@@ -411,11 +433,29 @@ export default function App() {
         <button className="primary" onClick={() => setTab("today")}>지금 실행</button>
       </section>
 
+      {!state.onboardingDone ? (
+        <section className="card onboardingCard">
+          <h2>1분 온보딩</h2>
+          <p>맞춤 동기부여를 위해 기본 정보만 입력해요.</p>
+          <div className="formRow compact">
+            <input value={onboardingName} onChange={(e) => setOnboardingName(e.target.value)} placeholder="이름 또는 닉네임" />
+            <input value={onboardingGoal} onChange={(e) => setOnboardingGoal(e.target.value)} placeholder="이번 주 핵심 목표 (예: 체중 -1kg)" />
+          </div>
+          <button className="primary" onClick={completeOnboarding}>시작하기</button>
+        </section>
+      ) : null}
+
       {tab === "today" && (
         <main className="stack">
           <section className="card">
             <div className="titleRow"><h2>오늘 해야 할 습관</h2><span>{doneToday}/{activeHabits.length}</span></div>
             <div className="habitList">
+              {activeHabits.length === 0 ? (
+                <article className="emptyState">
+                  <strong>오늘 활성 습관이 없어요</strong>
+                  <p>아래에서 습관을 추가하거나 템플릿을 선택해 시작해보세요.</p>
+                </article>
+              ) : null}
               {activeHabits.map((h) => (
                 <article key={h.id} className={`habitItem ${h.todayDone ? "done" : ""}`}>
                   <div>
@@ -541,6 +581,28 @@ export default function App() {
               <li>D7: 모멘텀 보상(토큰 지급)</li>
               <li>D14: 자동 루틴 추천</li>
             </ul>
+          </section>
+
+          <section className="card paywallMock">
+            <h2>프리미엄 목업 (결제 연결 전)</h2>
+            <div className="planGrid">
+              <article>
+                <small>무료</small>
+                <strong>₩0</strong>
+                <p>습관 3개, 기본 통계</p>
+              </article>
+              <article className="featured">
+                <small>Pro</small>
+                <strong>₩1,900/월</strong>
+                <p>무제한 습관 + 고급 분석 + AI 코치</p>
+              </article>
+              <article>
+                <small>Challenge Pack</small>
+                <strong>₩4,900</strong>
+                <p>30일 집중 루틴팩(직장인/다이어트/공부)</p>
+              </article>
+            </div>
+            <button className="primary">결제 연동 준비중</button>
           </section>
         </main>
       )}

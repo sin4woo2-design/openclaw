@@ -87,6 +87,18 @@ h1 { margin: 4px 0; font-size: 30px; line-height: 1.15; }
 .miniLabel { margin: 0 0 5px; font-size: 11px; letter-spacing: 0.08em; color: #c3d5ff; }
 .missionCard .primary { background: #fff; color: #23417a; border-color: #fff; white-space: nowrap; }
 
+.onboardingCard p { margin: 4px 0 10px; color: #60708e; }
+
+.emptyState {
+  border: 1px dashed #cdd9f0;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f9fbff;
+}
+
+.emptyState strong { display: block; margin-bottom: 4px; }
+.emptyState p { margin: 0; color: #60708e; }
+
 .stack { display: grid; gap: 12px; }
 .titleRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .titleRow span { font-size: 13px; color: #627290; }
@@ -196,6 +208,29 @@ input, select {
 
 .message { margin: 0; color: #2a4f99; font-weight: 600; font-size: 14px; }
 
+.paywallMock .planGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.paywallMock .planGrid article {
+  border: 1px solid #e3eaf8;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fbfcff;
+}
+
+.paywallMock .planGrid article.featured {
+  border-color: #9db7ee;
+  background: linear-gradient(135deg, #f6f9ff, #eef4ff);
+}
+
+.paywallMock small { color: #6f7f99; }
+.paywallMock strong { display: block; margin: 4px 0; color: #1f376a; }
+.paywallMock p { margin: 0; color: #576987; font-size: 13px; }
+
 .bottomDock {
   position: fixed;
   left: 50%;
@@ -278,6 +313,7 @@ input, select {
 @media (max-width: 760px) {
   .heroGrid, .kpiGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .insightGrid { grid-template-columns: 1fr; }
+  .paywallMock .planGrid { grid-template-columns: 1fr; }
   .formRow, .formRow.compact { grid-template-columns: 1fr; }
   .missionCard { display: grid; }
 }
