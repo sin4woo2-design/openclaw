@@ -234,6 +234,9 @@ export default function App() {
     });
   }, [state.dayLogs]);
 
+  const bestDay = [...weekBars].sort((a, b) => b.val - a.val)[0];
+  const weakDay = [...weekBars].sort((a, b) => a.val - b.val)[0];
+
   const doHabit = (habitId: string) => {
     let gained = 0;
     setState((prev) => ({
@@ -489,6 +492,19 @@ export default function App() {
               ))}
             </div>
           </section>
+
+          <section className="card insightGrid">
+            <article>
+              <small>강점 요일</small>
+              <strong>{bestDay?.day ?? "-"}요일</strong>
+              <p>{bestDay?.val ?? 0}%로 가장 높아요. 이 날엔 hard 습관을 배치하세요.</p>
+            </article>
+            <article>
+              <small>보완 요일</small>
+              <strong>{weakDay?.day ?? "-"}요일</strong>
+              <p>{weakDay?.val ?? 0}%로 낮아요. 2분 습관부터 시작해 실패를 줄이세요.</p>
+            </article>
+          </section>
         </main>
       )}
 
@@ -552,14 +568,20 @@ export default function App() {
 
       <nav className="bottomDock">
         {[
-          ["today", "오늘", "✓"],
-          ["stats", "통계", "▥"],
-          ["community", "도전", "⚑"],
-          ["lab", "랩", "✦"],
-          ["settings", "설정", "⚙"],
-        ].map(([id, label, icon]) => (
+          ["today", "오늘"],
+          ["stats", "통계"],
+          ["community", "도전"],
+          ["lab", "랩"],
+          ["settings", "설정"],
+        ].map(([id, label]) => (
           <button key={id} className={`dockBtn ${tab === id ? "active" : ""}`} onClick={() => setTab(id as typeof tab)}>
-            <span>{icon}</span>
+            <span className="dockIcon" aria-hidden>
+              {id === "today" ? <svg viewBox="0 0 24 24"><path d="M4 12.5 12 5l8 7.5" /><path d="M7 11.5V19h10v-7.5" /></svg> : null}
+              {id === "stats" ? <svg viewBox="0 0 24 24"><path d="M5 19V10" /><path d="M12 19V6" /><path d="M19 19v-4" /></svg> : null}
+              {id === "community" ? <svg viewBox="0 0 24 24"><path d="M7.5 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /><path d="M16.5 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /><path d="M3.8 18.5c.8-2 2.2-3 3.7-3s2.9 1 3.7 3" /><path d="M12.8 18.5c.8-2 2.2-3 3.7-3s2.9 1 3.7 3" /></svg> : null}
+              {id === "lab" ? <svg viewBox="0 0 24 24"><path d="M9 4h6" /><path d="M10 4v4l-4.5 7.8a3 3 0 0 0 2.6 4.5h8a3 3 0 0 0 2.6-4.5L14 8V4" /><path d="M8.5 14h7" /></svg> : null}
+              {id === "settings" ? <svg viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" /><path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1 1 0 0 1 0 1.4l-1 1a1 1 0 0 1-1.4 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-.1a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1 1 0 0 1-1.4 0l-1-1a1 1 0 0 1 0-1.4l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h.1a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1 1 0 0 1 0-1.4l1-1a1 1 0 0 1 1.4 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v.1a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1 1 0 0 1 1.4 0l1 1a1 1 0 0 1 0 1.4l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6H20a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-.1a1 1 0 0 0-.9.6Z" /></svg> : null}
+            </span>
             <small>{label}</small>
           </button>
         ))}
