@@ -51,9 +51,10 @@ type AppState = {
   levelPoint: number;
   dayLogs: DayLog[];
   lastOpenedDate: string;
+  momentumDays: number;
 };
 
-const STORAGE_KEY = "start-is-half-v3";
+const STORAGE_KEY = "start-is-half-v4";
 const nowDate = () => new Date().toISOString().slice(0, 10);
 const todayWeekday = () => new Date().getDay();
 const uid = () => Math.random().toString(36).slice(2, 10);
@@ -125,33 +126,33 @@ const initialState: AppState = {
   levelPoint: 145,
   dayLogs: [],
   lastOpenedDate: nowDate(),
+  momentumDays: 2,
 };
 
 function loadState(): AppState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return initialState;
-    const parsed = JSON.parse(raw) as AppState;
-    return { ...initialState, ...parsed };
+    return { ...initialState, ...(JSON.parse(raw) as AppState) };
   } catch {
     return initialState;
   }
 }
 
-function motivation(style: MotiveStyle, progress: number) {
+function motivation(style: MotiveStyle, progress: number, momentumDays: number) {
   if (style === "냉정한 코치") {
-    if (progress >= 80) return "좋다. 지금 멈추면 손해다. 오늘 끝까지 간다.";
-    if (progress >= 40) return "반 왔다. 한 칸 더 하면 승률이 달라진다.";
-    return "의지보다 구조. 2분짜리부터 시작.";
+    if (progress >= 80) return `좋다. ${momentumDays}일 흐름 끊지 마.`;
+    if (progress >= 40) return "반 왔다. 여기서 한 칸 더가 승부다.";
+    return "지금 2분짜리부터 시작. 행동이 먼저다.";
   }
 
   if (style === "따뜻한 코치") {
-    if (progress >= 80) return "잘하고 있어요. 오늘은 유지가 목표예요.";
-    if (progress >= 40) return "충분히 좋은 흐름이에요. 작은 체크 하나만 더 해봐요.";
-    return "지금 시작하면 이미 절반 성공이에요.";
+    if (progress >= 80) return `${momentumDays}일 흐름 너무 좋아요. 오늘은 유지가 목표예요.`;
+    if (progress >= 40) return "좋은 흐름이에요. 작은 체크 하나만 더 해봐요.";
+    return "괜찮아요. 지금 시작하면 이미 절반 성공이에요.";
   }
 
-  if (progress >= 80) return "좋아🔥 오늘 폼 제대로 왔다.";
+  if (progress >= 80) return `${momentumDays}일 연속 유지 중! 오늘 폼 좋아🔥`;
   if (progress >= 40) return "나이스. 리듬 탔어. 한 칸만 더!";
   return "딱 하나만 체크하자. 시작이 반 💪";
 }
@@ -183,20 +184,26 @@ export default function App() {
     if (state.lastOpenedDate === today) return;
 
     const completed = state.habits.filter((h) => h.todayDone).length;
+    const total = state.habits.length;
     const daily: DayLog = {
       date: state.lastOpenedDate,
       doneCount: completed,
-      totalCount: state.habits.length,
+      totalCount: total,
       mood,
       note: note.trim(),
     };
+
+    const successfulDay = total > 0 && completed / total >= 0.5;
 
     setState((prev) => ({
       ...prev,
       lastOpenedDate: today,
       dayLogs: [daily, ...prev.dayLogs].slice(0, 60),
+      momentumDays: successfulDay ? prev.momentumDays + 1 : 0,
+      freezeTokens: successfulDay && (prev.momentumDays + 1) % 7 === 0 ? prev.freezeTokens + 1 : prev.freezeTokens,
       habits: prev.habits.map((h) => ({ ...h, todayDone: false })),
     }));
+
     setNote("");
     setMood("보통");
   }, [state.lastOpenedDate, state.habits, mood, note]);
@@ -211,6 +218,7 @@ export default function App() {
   const totalDone = state.habits.reduce((s, h) => s + h.totalDone, 0);
   const avgStreak = state.habits.length ? Math.round(state.habits.reduce((s, h) => s + h.streak, 0) / state.habits.length) : 0;
   const topHabit = [...state.habits].sort((a, b) => b.streak - a.streak)[0];
+  const firstEasy = activeHabits.find((h) => !h.todayDone)?.name ?? "가벼운 습관 1개";
 
   const level = Math.floor(state.levelPoint / 100) + 1;
   const levelProgress = state.levelPoint % 100;
@@ -232,7 +240,10 @@ export default function App() {
       ...prev,
       habits: prev.habits.map((h) => {
         if (h.id !== habitId) return h;
-        if (h.todayDone) return { ...h, todayDone: false, streak: Math.max(0, h.streak - 1), totalDone: Math.max(0, h.totalDone - 1) };
+        if (h.todayDone) {
+          return { ...h, todayDone: false, streak: Math.max(0, h.streak - 1), totalDone: Math.max(0, h.totalDone - 1) };
+        }
+
         gained = h.difficulty === "hard" ? 12 : h.difficulty === "normal" ? 8 : 6;
         return {
           ...h,
@@ -255,6 +266,7 @@ export default function App() {
       ...prev,
       habits: prev.habits.map((h) => (h.id === habitId ? { ...h, todayDone: false, streak: Math.max(0, h.streak - 1) } : h)),
     }));
+
     setGame({ habitId, target: Math.floor(Math.random() * 10) + 1, triesLeft: 2 });
     setMessage("괜찮아. 복구 미니게임으로 이어가자.");
   };
@@ -270,6 +282,7 @@ export default function App() {
       freezeTokens: prev.freezeTokens - 1,
       habits: prev.habits.map((h) => (h.id === habitId ? { ...h, todayDone: true } : h)),
     }));
+
     setToast("방어 성공");
   };
 
@@ -291,6 +304,7 @@ export default function App() {
       setMessage("이번엔 실패. 내일 다시 시작하면 된다.");
       return;
     }
+
     setGame({ ...game, triesLeft: game.triesLeft - 1 });
   };
 
@@ -317,12 +331,14 @@ export default function App() {
         },
       ],
     }));
+
     setNewHabitName("");
     setToast("새 습관 추가");
   };
 
   const addTemplate = (template: Pick<Habit, "name" | "category" | "difficulty">) => {
     if (state.habits.some((h) => h.name === template.name)) return;
+
     setState((prev) => ({
       ...prev,
       habits: [
@@ -344,43 +360,53 @@ export default function App() {
     }));
   };
 
+  const joinedCount = state.challenges.filter((c) => c.joined).length;
+
   return (
     <div className="app">
       <header className="hero card">
         <div>
           <p className="eyebrow">START IS HALF · 시작이 반</p>
           <h1>시작하면 이미 절반 성공</h1>
-          <p className="sub">동기부여를 유지하는 상용화형 습관 루프</p>
+          <p className="sub">습관을 계속하게 만드는 동기부여 루프</p>
         </div>
 
-        <div className="heroStats">
-          <article><span>오늘 진행률</span><strong>{progress}%</strong></article>
-          <article><span>연속 최고</span><strong>{topHabit ? `${topHabit.bestStreak}일` : "-"}</strong></article>
-          <article><span>프리즈 토큰</span><strong>{state.freezeTokens}개</strong></article>
+        <div className="heroGrid">
+          <article>
+            <span>오늘 진행률</span>
+            <strong>{progress}%</strong>
+          </article>
+          <article>
+            <span>모멘텀</span>
+            <strong>{state.momentumDays}일</strong>
+          </article>
+          <article>
+            <span>프리즈 토큰</span>
+            <strong>{state.freezeTokens}개</strong>
+          </article>
+          <article>
+            <span>참여 챌린지</span>
+            <strong>{joinedCount}개</strong>
+          </article>
         </div>
 
         <div className="levelTrack">
-          <div className="levelHead"><b>Lv.{level}</b><small>{levelProgress}/100 XP</small></div>
+          <div className="levelHead">
+            <b>Lv.{level}</b>
+            <small>{levelProgress}/100 XP</small>
+          </div>
           <div className="meter"><i style={{ width: `${levelProgress}%` }} /></div>
         </div>
       </header>
 
-      <section className="card guidance">
-        <strong>오늘의 코치 메시지</strong>
-        <p>{motivation(state.motiveStyle, progress)}</p>
+      <section className="card missionCard">
+        <div>
+          <p className="miniLabel">TODAY MISSION</p>
+          <strong>{progress < 100 ? `${firstEasy} 먼저 체크` : "오늘 미션 클리어 🎉"}</strong>
+          <p>{motivation(state.motiveStyle, progress, state.momentumDays)}</p>
+        </div>
+        <button className="primary" onClick={() => setTab("today")}>지금 실행</button>
       </section>
-
-      <nav className="tabs card">
-        {[
-          ["today", "오늘"],
-          ["stats", "통계"],
-          ["community", "도전"],
-          ["lab", "리텐션랩"],
-          ["settings", "설정"],
-        ].map(([id, label]) => (
-          <button key={id} className={tab === id ? "active" : ""} onClick={() => setTab(id as typeof tab)}>{label}</button>
-        ))}
-      </nav>
 
       {tab === "today" && (
         <main className="stack">
@@ -390,8 +416,11 @@ export default function App() {
               {activeHabits.map((h) => (
                 <article key={h.id} className={`habitItem ${h.todayDone ? "done" : ""}`}>
                   <div>
-                    <strong>{h.name}</strong>
-                    <p>{h.category} · {difficultyLabel[h.difficulty]} · 연속 {h.streak}일</p>
+                    <div className="habitTitleRow">
+                      <strong>{h.name}</strong>
+                      <span className="difficultyPill">{difficultyLabel[h.difficulty]}</span>
+                    </div>
+                    <p>{h.category} · 연속 {h.streak}일 · 최고 {h.bestStreak}일</p>
                   </div>
                   <div className="actions">
                     <button className="primary" onClick={() => doHabit(h.id)}>{h.todayDone ? "체크 취소" : "완료 체크"}</button>
@@ -404,7 +433,7 @@ export default function App() {
           </section>
 
           <section className="card">
-            <h2>습관 추가</h2>
+            <h2>습관 빠르게 추가</h2>
             <div className="formRow">
               <input placeholder="예: 10분 스트레칭" value={newHabitName} onChange={(e) => setNewHabitName(e.target.value)} />
               <select value={newCategory} onChange={(e) => setNewCategory(e.target.value as HabitCategory)}>
@@ -437,7 +466,7 @@ export default function App() {
               <select value={mood} onChange={(e) => setMood(e.target.value as DayLog["mood"])}>
                 <option>최고</option><option>좋음</option><option>보통</option><option>저조</option>
               </select>
-              <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="오늘 잘 된 한 가지를 적어봐" />
+              <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="오늘 잘 된 한 가지" />
             </div>
           </section>
           <p className="message">{message}</p>
@@ -493,7 +522,7 @@ export default function App() {
             <ul>
               <li>D1: 첫 체크 3분 이내</li>
               <li>D3: 실패 직후 복구 미니게임 노출</li>
-              <li>D7: 성취 배지 + 토큰 지급</li>
+              <li>D7: 모멘텀 보상(토큰 지급)</li>
               <li>D14: 자동 루틴 추천</li>
             </ul>
           </section>
@@ -520,6 +549,21 @@ export default function App() {
           </section>
         </main>
       )}
+
+      <nav className="bottomDock">
+        {[
+          ["today", "오늘", "✓"],
+          ["stats", "통계", "▥"],
+          ["community", "도전", "⚑"],
+          ["lab", "랩", "✦"],
+          ["settings", "설정", "⚙"],
+        ].map(([id, label, icon]) => (
+          <button key={id} className={`dockBtn ${tab === id ? "active" : ""}`} onClick={() => setTab(id as typeof tab)}>
+            <span>{icon}</span>
+            <small>{label}</small>
+          </button>
+        ))}
+      </nav>
 
       {toast ? <div className="toast">{toast}</div> : null}
     </div>

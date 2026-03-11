@@ -5,14 +5,14 @@
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; background: radial-gradient(circle at top right, #e9f1ff 0%, #f7f8fc 30%, #f4f6fb 100%); }
+body { margin: 0; background: radial-gradient(circle at top right, #e9f1ff 0%, #f7f8fc 35%, #f4f6fb 100%); }
 button, input, select { font: inherit; }
 
 .app {
   max-width: 920px;
   margin: 0 auto;
   min-height: 100dvh;
-  padding: 18px 14px 80px;
+  padding: 16px 14px calc(110px + env(safe-area-inset-bottom));
   display: grid;
   gap: 12px;
 }
@@ -35,13 +35,13 @@ button, input, select { font: inherit; }
 h1 { margin: 4px 0; font-size: 30px; line-height: 1.15; }
 .sub { margin: 0; color: #60708e; }
 
-.heroStats {
+.heroGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
-.heroStats article {
+.heroGrid article {
   border: 1px solid #dce5f5;
   border-radius: 12px;
   padding: 10px;
@@ -49,8 +49,9 @@ h1 { margin: 4px 0; font-size: 30px; line-height: 1.15; }
   display: grid;
   gap: 4px;
 }
-.heroStats span { font-size: 12px; color: #6e7d95; }
-.heroStats strong { font-size: 20px; color: #1d2a42; }
+
+.heroGrid span { font-size: 11px; color: #6e7d95; }
+.heroGrid strong { font-size: 19px; color: #1d2a42; }
 
 .levelTrack { display: grid; gap: 6px; }
 .levelHead { display: flex; justify-content: space-between; align-items: center; }
@@ -71,32 +72,20 @@ h1 { margin: 4px 0; font-size: 30px; line-height: 1.15; }
   transition: width .25s ease;
 }
 
-.guidance strong { display: block; font-size: 13px; color: #4f5f7b; }
-.guidance p { margin: 5px 0 0; font-size: 15px; color: #20293a; }
-
-.tabs {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0,1fr));
-  gap: 6px;
-  padding: 8px;
-  position: sticky;
-  top: 0;
-  z-index: 5;
+.missionCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #1f3358, #2f4f86);
+  color: #f4f7ff;
+  border-color: #2f4f86;
 }
 
-.tabs button {
-  border: 1px solid #dee6f4;
-  border-radius: 10px;
-  background: #f7faff;
-  color: #5d6f8f;
-  min-height: 38px;
-  font-size: 13px;
-}
-.tabs button.active {
-  background: #4f79dd;
-  border-color: #4f79dd;
-  color: #fff;
-}
+.missionCard p, .missionCard strong { margin: 0; }
+.missionCard strong { font-size: 18px; }
+.miniLabel { margin: 0 0 5px; font-size: 11px; letter-spacing: 0.08em; color: #c3d5ff; }
+.missionCard .primary { background: #fff; color: #23417a; border-color: #fff; white-space: nowrap; }
 
 .stack { display: grid; gap: 12px; }
 .titleRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -113,9 +102,20 @@ h2 { margin: 0; font-size: 19px; color: #1c2740; }
   gap: 8px;
   transition: transform .18s ease, box-shadow .18s ease;
 }
+
 .habitItem:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(42, 66, 117, 0.08); }
 .habitItem.done { border-color: #b9dfc7; background: #f4fcf7; }
 .habitItem p, .challengeItem p, .challengeItem small { margin: 3px 0 0; color: #687895; font-size: 13px; }
+
+.habitTitleRow { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.difficultyPill {
+  font-size: 11px;
+  border: 1px solid #d0dcf3;
+  background: #eef4ff;
+  color: #3b5ca1;
+  border-radius: 999px;
+  padding: 4px 8px;
+}
 
 .actions { display: flex; flex-wrap: wrap; gap: 6px; }
 button {
@@ -125,6 +125,7 @@ button {
   padding: 8px 10px;
   color: #2f3d58;
 }
+
 button.primary { background: #4f79dd; border-color: #4f79dd; color: #fff; }
 button.soft { background: #edf8f1; border-color: #bfe3cc; color: #236744; }
 button.active { background: #e9f0ff; border-color: #c6d6f8; color: #3058a8; }
@@ -135,6 +136,7 @@ button.active { background: #e9f0ff; border-color: #c6d6f8; color: #3058a8; }
   gap: 8px;
 }
 .formRow.compact { grid-template-columns: 120px 1fr; }
+
 input, select {
   border: 1px solid #d4def0;
   border-radius: 10px;
@@ -160,6 +162,7 @@ input, select {
   align-items: end;
   gap: 8px;
 }
+
 .barWrap { display: grid; gap: 4px; justify-items: center; }
 .barWrap i {
   width: 100%;
@@ -173,17 +176,57 @@ input, select {
 
 .message { margin: 0; color: #2a4f99; font-weight: 600; font-size: 14px; }
 
+.bottomDock {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  width: min(920px, calc(100% - 16px));
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #dbe4f5;
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 24px rgba(17, 28, 49, 0.14);
+  z-index: 30;
+}
+
+.dockBtn {
+  min-height: 54px;
+  border: 0;
+  background: transparent;
+  color: #65758f;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 2px;
+  border-radius: 12px;
+}
+
+.dockBtn span { font-size: 16px; line-height: 1; }
+.dockBtn small { font-size: 11px; }
+
+.dockBtn.active {
+  color: #1f376a;
+  background: #edf3ff;
+  font-weight: 700;
+}
+
 .toast {
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  bottom: calc(82px + env(safe-area-inset-bottom));
   background: #1f2b43;
   color: #fff;
   padding: 10px 14px;
   border-radius: 999px;
   box-shadow: 0 8px 20px rgba(20,31,52,.24);
   animation: toastIn .2s ease;
+  z-index: 40;
 }
 
 @keyframes toastIn {
@@ -192,7 +235,7 @@ input, select {
 }
 
 @media (max-width: 760px) {
-  .heroStats, .kpiGrid { grid-template-columns: 1fr; }
-  .tabs { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .heroGrid, .kpiGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .formRow, .formRow.compact { grid-template-columns: 1fr; }
+  .missionCard { display: grid; }
 }
