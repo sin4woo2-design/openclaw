@@ -778,13 +778,7 @@ export default function App() {
         <main className="stack">
           <section className="card petShowcase">
             <div className={`pixelPet ${state.pet.species}`}>
-              <div className="petSprite" aria-hidden>
-                <i className="ear left" />
-                <i className="ear right" />
-                <i className="eye left" />
-                <i className="eye right" />
-                <i className="nose" />
-              </div>
+              <div className="petSpriteSheet" aria-hidden />
               <small>{petMeta.emoji}</small>
             </div>
             <h2>{state.pet.name}</h2>
