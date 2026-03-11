@@ -25,14 +25,36 @@ button, input, select { font: inherit; }
   box-shadow: 0 8px 22px rgba(24, 39, 75, 0.06);
 }
 
-.hero {
-  background: linear-gradient(140deg, #ffffff 0%, #edf4ff 52%, #f8fbff 100%);
+.brandBar {
   display: grid;
-  gap: 12px;
+  gap: 6px;
+  position: sticky;
+  top: 8px;
+  z-index: 10;
+  backdrop-filter: blur(8px);
 }
 
+.brandBarRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #5d6f8f;
+  font-size: 13px;
+}
+
+.tabHero {
+  display: grid;
+  gap: 10px;
+}
+
+.todayTone { background: linear-gradient(140deg, #ffffff 0%, #edf4ff 52%, #f8fbff 100%); }
+.statsTone { background: linear-gradient(140deg, #ffffff 0%, #eef8ff 52%, #f6fdff 100%); }
+.communityTone { background: linear-gradient(140deg, #ffffff 0%, #f1f4ff 52%, #f8f8ff 100%); }
+.labTone { background: linear-gradient(140deg, #ffffff 0%, #f6f2ff 52%, #fcf9ff 100%); }
+.settingsTone { background: linear-gradient(140deg, #ffffff 0%, #f3f5f9 52%, #fafbfc 100%); }
+
 .eyebrow { margin: 0; font-size: 11px; letter-spacing: 0.08em; color: #5277c9; font-weight: 700; }
-h1 { margin: 4px 0; font-size: 30px; line-height: 1.15; }
+h1 { margin: 2px 0; font-size: 28px; line-height: 1.15; }
 .sub { margin: 0; color: #60708e; }
 
 .heroGrid {
@@ -98,6 +120,10 @@ h1 { margin: 4px 0; font-size: 30px; line-height: 1.15; }
 
 .emptyState strong { display: block; margin-bottom: 4px; }
 .emptyState p { margin: 0; color: #60708e; }
+
+.tabStage {
+  animation: tabSwitch .22s ease;
+}
 
 .stack { display: grid; gap: 12px; }
 .titleRow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -307,6 +333,11 @@ input, select {
 
 @keyframes cardIn {
   from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tabSwitch {
+  from { opacity: .3; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 

@@ -229,7 +229,6 @@ export default function App() {
   const firstEasy = activeHabits.find((h) => !h.todayDone)?.name ?? "가벼운 습관 1개";
 
   const level = Math.floor(state.levelPoint / 100) + 1;
-  const levelProgress = state.levelPoint % 100;
 
   const weekBars = useMemo(() => {
     const logs = state.dayLogs.slice(0, 21);
@@ -387,51 +386,73 @@ export default function App() {
     setToast("온보딩 완료");
   };
 
+  const tabHeader = {
+    today: {
+      eyebrow: "TODAY EXECUTION",
+      title: state.userName ? `${state.userName}님의 오늘 실행` : "오늘 실행",
+      desc: progress < 100 ? `${firstEasy}부터 시작하면 반은 끝입니다.` : "오늘 미션 완료! 유지 모드로 갑니다.",
+      tone: "todayTone",
+    },
+    stats: {
+      eyebrow: "WEEKLY INSIGHTS",
+      title: "성과 분석",
+      desc: `강점은 ${bestDay?.day ?? "-"}요일, 보완은 ${weakDay?.day ?? "-"}요일입니다.`,
+      tone: "statsTone",
+    },
+    community: {
+      eyebrow: "SOCIAL CHALLENGE",
+      title: "같이 도전",
+      desc: `${joinedCount}개 챌린지 참여 중 · 동료와 리듬을 맞춰보세요.`,
+      tone: "communityTone",
+    },
+    lab: {
+      eyebrow: "GROWTH LAB",
+      title: "리텐션 랩",
+      desc: "상용화 실험 기능과 전환 포인트를 점검합니다.",
+      tone: "labTone",
+    },
+    settings: {
+      eyebrow: "PERSONALIZATION",
+      title: "개인 설정",
+      desc: "코치 톤과 데이터 정책을 내 스타일에 맞게 조정하세요.",
+      tone: "settingsTone",
+    },
+  }[tab];
+
   return (
     <div className="app">
-      <header className="hero card">
-        <div>
-          <p className="eyebrow">START IS HALF · 시작이 반</p>
-          <h1>시작하면 이미 절반 성공</h1>
-          <p className="sub">습관을 계속하게 만드는 동기부여 루프</p>
-        </div>
-
-        <div className="heroGrid">
-          <article>
-            <span>오늘 진행률</span>
-            <strong>{progress}%</strong>
-          </article>
-          <article>
-            <span>모멘텀</span>
-            <strong>{state.momentumDays}일</strong>
-          </article>
-          <article>
-            <span>프리즈 토큰</span>
-            <strong>{state.freezeTokens}개</strong>
-          </article>
-          <article>
-            <span>참여 챌린지</span>
-            <strong>{joinedCount}개</strong>
-          </article>
-        </div>
-
-        <div className="levelTrack">
-          <div className="levelHead">
-            <b>Lv.{level}</b>
-            <small>{levelProgress}/100 XP</small>
-          </div>
-          <div className="meter"><i style={{ width: `${levelProgress}%` }} /></div>
+      <header className="brandBar card">
+        <p className="eyebrow">START IS HALF · 시작이 반</p>
+        <div className="brandBarRow">
+          <strong>Lv.{level}</strong>
+          <span>모멘텀 {state.momentumDays}일 · 토큰 {state.freezeTokens}개</span>
         </div>
       </header>
 
-      <section className="card missionCard">
-        <div>
-          <p className="miniLabel">TODAY MISSION</p>
-          <strong>{progress < 100 ? `${firstEasy} 먼저 체크` : "오늘 미션 클리어 🎉"}</strong>
-          <p>{motivation(state.motiveStyle, progress, state.momentumDays)}</p>
-        </div>
-        <button className="primary" onClick={() => setTab("today")}>지금 실행</button>
+      <section className={`card tabHero ${tabHeader.tone}`}>
+        <p className="miniLabel">{tabHeader.eyebrow}</p>
+        <h1>{tabHeader.title}</h1>
+        <p className="sub">{tabHeader.desc}</p>
+        {tab === "today" ? (
+          <div className="heroGrid">
+            <article><span>오늘 진행률</span><strong>{progress}%</strong></article>
+            <article><span>누적 완료</span><strong>{totalDone}회</strong></article>
+            <article><span>참여 챌린지</span><strong>{joinedCount}개</strong></article>
+            <article><span>집중 목표</span><strong>{state.focusGoal || "설정 필요"}</strong></article>
+          </div>
+        ) : null}
       </section>
+
+      {tab === "today" ? (
+        <section className="card missionCard">
+          <div>
+            <p className="miniLabel">TODAY MISSION</p>
+            <strong>{progress < 100 ? `${firstEasy} 먼저 체크` : "오늘 미션 클리어 🎉"}</strong>
+            <p>{motivation(state.motiveStyle, progress, state.momentumDays)}</p>
+          </div>
+          <button className="primary" onClick={() => setTab("today")}>지금 실행</button>
+        </section>
+      ) : null}
 
       {!state.onboardingDone ? (
         <section className="card onboardingCard">
@@ -445,6 +466,7 @@ export default function App() {
         </section>
       ) : null}
 
+      <div key={tab} className="tabStage">
       {tab === "today" && (
         <main className="stack">
           <section className="card">
@@ -627,6 +649,7 @@ export default function App() {
           </section>
         </main>
       )}
+      </div>
 
       <nav className="bottomDock">
         {[
