@@ -777,7 +777,16 @@ export default function App() {
       {tab === "pet" && (
         <main className="stack">
           <section className="card petShowcase">
-            <div className="pixelPet">{petMeta.emoji}</div>
+            <div className={`pixelPet ${state.pet.species}`}>
+              <div className="petSprite" aria-hidden>
+                <i className="ear left" />
+                <i className="ear right" />
+                <i className="eye left" />
+                <i className="eye right" />
+                <i className="nose" />
+              </div>
+              <small>{petMeta.emoji}</small>
+            </div>
             <h2>{state.pet.name}</h2>
             <p>Lv.{state.pet.level} · XP {state.pet.xp}/100 · 무드 {state.pet.mood}%</p>
             <div className="petActions">

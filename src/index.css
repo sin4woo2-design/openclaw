@@ -263,16 +263,92 @@ h2 { margin: 0; font-size: 19px; color: #eef2ff; }
 }
 
 .pixelPet {
-  width: 112px;
-  height: 112px;
+  width: 132px;
   margin: 0 auto;
-  border-radius: 20px;
   display: grid;
-  place-items: center;
-  font-size: 56px;
-  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
-  border: 1px solid rgba(255,255,255,.24);
+  justify-items: center;
+  gap: 6px;
+}
+
+.pixelPet small {
+  font-size: 11px;
+  color: #d7e0ff;
+}
+
+.petSprite {
+  width: 116px;
+  height: 116px;
+  border-radius: 18px;
+  position: relative;
+  background: linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.08));
+  border: 1px solid rgba(255,255,255,.28);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 10px 24px rgba(15, 18, 40, .45);
+  image-rendering: pixelated;
+  animation: petBob 1.6s steps(2, end) infinite;
+}
+
+.petSprite::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 44px;
+  transform: translate(-50%, -32%);
+  border-radius: 12px;
+  background: #ffd38a;
+  box-shadow:
+    0 0 0 4px #f5b86f,
+    0 20px 0 -8px #f4c57f;
+}
+
+.pixelPet.campbell .petSprite::before {
+  background: #b9b2ff;
+  box-shadow: 0 0 0 4px #9088e6, 0 20px 0 -8px #a6a0f2;
+}
+
+.pixelPet.capybara .petSprite::before {
+  background: #c99772;
+  box-shadow: 0 0 0 4px #9c6f4f, 0 20px 0 -8px #b98965;
+}
+
+.petSprite .ear {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  background: #f5b86f;
+  top: 24px;
+}
+
+.pixelPet.campbell .petSprite .ear { background: #9088e6; }
+.pixelPet.capybara .petSprite .ear { background: #9c6f4f; }
+
+.petSprite .ear.left { left: 34px; }
+.petSprite .ear.right { right: 34px; }
+
+.petSprite .eye {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: #2d2d2d;
+  top: 56px;
+  animation: petBlink 3.5s steps(2, end) infinite;
+}
+
+.petSprite .eye.left { left: 46px; }
+.petSprite .eye.right { right: 46px; }
+
+.petSprite .nose {
+  position: absolute;
+  width: 8px;
+  height: 6px;
+  border-radius: 2px;
+  background: #ff9cb4;
+  top: 66px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .petActions,
@@ -593,6 +669,16 @@ input, select {
 @keyframes pop {
   from { opacity: 1; transform: translateY(0) scale(1); }
   to { opacity: 0; transform: translateY(-34px) scale(.3); }
+}
+
+@keyframes petBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes petBlink {
+  0%, 44%, 100% { transform: scaleY(1); }
+  45%, 47% { transform: scaleY(0.2); }
 }
 
 @media (max-width: 760px) {
