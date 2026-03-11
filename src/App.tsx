@@ -43,6 +43,20 @@ type RecoveryGame = {
   triesLeft: number;
 };
 
+type PetSpecies = "golden-hamster" | "campbell" | "capybara";
+
+type PetState = {
+  species: PetSpecies;
+  name: string;
+  level: number;
+  xp: number;
+  mood: number;
+  coins: number;
+  failShield: number;
+  accessoriesOwned: string[];
+  equippedAccessory: string;
+};
+
 type AppState = {
   habits: Habit[];
   challenges: Challenge[];
@@ -55,6 +69,7 @@ type AppState = {
   onboardingDone: boolean;
   userName: string;
   focusGoal: string;
+  pet: PetState;
 };
 
 const STORAGE_KEY = "start-is-half-v4";
@@ -75,6 +90,18 @@ const templates: Array<Pick<Habit, "name" | "category" | "difficulty">> = [
   { name: "감사 3줄", category: "마음", difficulty: "easy" },
   { name: "5분 정리", category: "생활", difficulty: "easy" },
   { name: "야식 안 먹기", category: "건강", difficulty: "hard" },
+];
+
+const petSpeciesMeta: Record<PetSpecies, { label: string; emoji: string; ability: string }> = {
+  "golden-hamster": { label: "골든 햄스터", emoji: "🐹", ability: "실패 1회 자동 방어" },
+  campbell: { label: "캠벨 햄스터", emoji: "🐭", ability: "완료 시 경험치 +10%" },
+  capybara: { label: "카피바라", emoji: "🦫", ability: "가끔 2회 달성으로 카운트" },
+};
+
+const accessoryShop = [
+  { id: "basic-hat", name: "미니 모자", price: 30 },
+  { id: "neon-glasses", name: "네온 안경", price: 60 },
+  { id: "hero-cape", name: "히어로 망토", price: 120 },
 ];
 
 const initialState: AppState = {
@@ -133,6 +160,17 @@ const initialState: AppState = {
   onboardingDone: false,
   userName: "",
   focusGoal: "",
+  pet: {
+    species: "golden-hamster",
+    name: "반이",
+    level: 1,
+    xp: 0,
+    mood: 80,
+    coins: 50,
+    failShield: 1,
+    accessoriesOwned: ["basic-hat"],
+    equippedAccessory: "basic-hat",
+  },
 };
 
 function loadState(): AppState {
@@ -164,7 +202,7 @@ function motivation(style: MotiveStyle, progress: number, momentumDays: number) 
 }
 
 export default function App() {
-  const [tab, setTab] = useState<"today" | "stats" | "community" | "lab" | "settings">("today");
+  const [tab, setTab] = useState<"today" | "stats" | "community" | "pet" | "lab" | "settings">("today");
   const [state, setState] = useState<AppState>(loadState);
   const [newHabitName, setNewHabitName] = useState("");
   const [newCategory, setNewCategory] = useState<HabitCategory>("건강");
@@ -218,6 +256,11 @@ export default function App() {
       momentumDays: successfulDay ? prev.momentumDays + 1 : 0,
       freezeTokens: successfulDay && (prev.momentumDays + 1) % 7 === 0 ? prev.freezeTokens + 1 : prev.freezeTokens,
       habits: prev.habits.map((h) => ({ ...h, todayDone: false })),
+      pet: {
+        ...prev.pet,
+        mood: Math.max(20, prev.pet.mood - 8),
+        failShield: prev.pet.species === "golden-hamster" ? 1 : prev.pet.failShield,
+      },
     }));
 
     setNote("");
@@ -255,37 +298,76 @@ export default function App() {
 
   const doHabit = (habitId: string) => {
     let gained = 0;
-    setState((prev) => ({
-      ...prev,
-      habits: prev.habits.map((h) => {
+    let capyBonus = false;
+
+    setState((prev) => {
+      const isCapy = prev.pet.species === "capybara";
+      capyBonus = isCapy && Math.random() < 0.22;
+
+      const habits = prev.habits.map((h) => {
         if (h.id !== habitId) return h;
         if (h.todayDone) {
           return { ...h, todayDone: false, streak: Math.max(0, h.streak - 1), totalDone: Math.max(0, h.totalDone - 1) };
         }
 
         gained = h.difficulty === "hard" ? 12 : h.difficulty === "normal" ? 8 : 6;
+        const totalInc = capyBonus ? 2 : 1;
         return {
           ...h,
           todayDone: true,
-          streak: h.streak + 1,
-          bestStreak: Math.max(h.bestStreak, h.streak + 1),
-          totalDone: h.totalDone + 1,
+          streak: h.streak + totalInc,
+          bestStreak: Math.max(h.bestStreak, h.streak + totalInc),
+          totalDone: h.totalDone + totalInc,
           lastDoneAt: new Date().toISOString(),
         };
-      }),
-      levelPoint: prev.levelPoint + gained,
-    }));
+      });
 
-    setToast("체크 완료 +XP");
+      const petXpGain = Math.round(gained * (prev.pet.species === "campbell" ? 1.1 : 1));
+      const nextXp = prev.pet.xp + petXpGain;
+      const petLevelUp = nextXp >= 100;
+
+      return {
+        ...prev,
+        habits,
+        levelPoint: prev.levelPoint + gained,
+        pet: {
+          ...prev.pet,
+          xp: petLevelUp ? nextXp - 100 : nextXp,
+          level: petLevelUp ? prev.pet.level + 1 : prev.pet.level,
+          coins: prev.pet.coins + 4 + (capyBonus ? 3 : 0),
+          mood: Math.min(100, prev.pet.mood + 4),
+        },
+      };
+    });
+
+    setToast(capyBonus ? "체크 완료 + 카피바라 더블!" : "체크 완료 +XP");
     setBurst(true);
-    setMessage("좋아. 한 칸 채웠다. 시작이 반!");
+    setMessage(capyBonus ? "카피바라 버프 발동! 2회 달성으로 반영됐어." : "좋아. 한 칸 채웠다. 시작이 반!");
   };
 
   const failHabit = (habitId: string) => {
-    setState((prev) => ({
-      ...prev,
-      habits: prev.habits.map((h) => (h.id === habitId ? { ...h, todayDone: false, streak: Math.max(0, h.streak - 1) } : h)),
-    }));
+    let blocked = false;
+    setState((prev) => {
+      if (prev.pet.species === "golden-hamster" && prev.pet.failShield > 0) {
+        blocked = true;
+        return {
+          ...prev,
+          pet: { ...prev.pet, failShield: prev.pet.failShield - 1, mood: Math.min(100, prev.pet.mood + 2) },
+        };
+      }
+
+      return {
+        ...prev,
+        habits: prev.habits.map((h) => (h.id === habitId ? { ...h, todayDone: false, streak: Math.max(0, h.streak - 1) } : h)),
+        pet: { ...prev.pet, mood: Math.max(10, prev.pet.mood - 6) },
+      };
+    });
+
+    if (blocked) {
+      setToast("햄스터 보호막 발동!");
+      setMessage("골든 햄스터가 실패 1회를 막아줬어 🛡️");
+      return;
+    }
 
     setGame({ habitId, target: Math.floor(Math.random() * 10) + 1, triesLeft: 2 });
     setMessage("괜찮아. 복구 미니게임으로 이어가자.");
@@ -381,6 +463,56 @@ export default function App() {
   };
 
   const joinedCount = state.challenges.filter((c) => c.joined).length;
+  const petMeta = petSpeciesMeta[state.pet.species];
+
+  const equipAccessory = (id: string) => {
+    if (!state.pet.accessoriesOwned.includes(id)) return;
+    setState((prev) => ({ ...prev, pet: { ...prev.pet, equippedAccessory: id } }));
+  };
+
+  const buyAccessory = (id: string, price: number) => {
+    setState((prev) => {
+      if (prev.pet.accessoriesOwned.includes(id) || prev.pet.coins < price) return prev;
+      return {
+        ...prev,
+        pet: {
+          ...prev.pet,
+          coins: prev.pet.coins - price,
+          accessoriesOwned: [...prev.pet.accessoriesOwned, id],
+        },
+      };
+    });
+  };
+
+  const setSpecies = (species: PetSpecies) => {
+    setState((prev) => ({
+      ...prev,
+      pet: {
+        ...prev.pet,
+        species,
+        failShield: species === "golden-hamster" ? 1 : 0,
+      },
+    }));
+    setToast(`${petSpeciesMeta[species].label} 선택 완료`);
+  };
+
+  const petInteract = (kind: "feed" | "pet" | "play") => {
+    setState((prev) => {
+      const moodGain = kind === "play" ? 8 : 5;
+      const xpGain = kind === "feed" ? 6 : 4;
+      const nextXp = prev.pet.xp + xpGain;
+      return {
+        ...prev,
+        pet: {
+          ...prev.pet,
+          mood: Math.min(100, prev.pet.mood + moodGain),
+          xp: nextXp >= 100 ? nextXp - 100 : nextXp,
+          level: nextXp >= 100 ? prev.pet.level + 1 : prev.pet.level,
+        },
+      };
+    });
+    setToast(kind === "feed" ? "간식 주기 완료" : kind === "pet" ? "쓰다듬기 완료" : "놀이 완료");
+  };
 
   const completeOnboarding = () => {
     if (!onboardingName.trim() || !onboardingGoal.trim()) {
@@ -414,6 +546,12 @@ export default function App() {
       title: "같이 도전",
       desc: `${joinedCount}개 챌린지 참여 중 · 동료와 리듬을 맞춰보세요.`,
       tone: "communityTone",
+    },
+    pet: {
+      eyebrow: "PIXEL PET STUDIO",
+      title: `${petMeta.label} 키우기`,
+      desc: `${petMeta.ability} · 레벨 ${state.pet.level} · 무드 ${state.pet.mood}%`,
+      tone: "petTone",
     },
     lab: {
       eyebrow: "GROWTH LAB",
@@ -455,6 +593,7 @@ export default function App() {
             <article><span>누적 완료</span><strong>{totalDone}회</strong></article>
             <article><span>참여 챌린지</span><strong>{joinedCount}개</strong></article>
             <article><span>집중 목표</span><strong>{state.focusGoal || "설정 필요"}</strong></article>
+            <article className="petMini"><span>펫 상태</span><strong>{petMeta.emoji} Lv.{state.pet.level}</strong></article>
           </div>
         ) : null}
       </section>
@@ -635,6 +774,55 @@ export default function App() {
         </main>
       )}
 
+      {tab === "pet" && (
+        <main className="stack">
+          <section className="card petShowcase">
+            <div className="pixelPet">{petMeta.emoji}</div>
+            <h2>{state.pet.name}</h2>
+            <p>Lv.{state.pet.level} · XP {state.pet.xp}/100 · 무드 {state.pet.mood}%</p>
+            <div className="petActions">
+              <button onClick={() => petInteract("feed")}>간식 주기</button>
+              <button onClick={() => petInteract("pet")}>쓰다듬기</button>
+              <button onClick={() => petInteract("play")}>놀아주기</button>
+            </div>
+            <small>특수 능력: {petMeta.ability}</small>
+          </section>
+
+          <section className="card">
+            <h2>종류 선택</h2>
+            <div className="speciesGrid">
+              {(Object.keys(petSpeciesMeta) as PetSpecies[]).map((sp) => (
+                <button key={sp} className={state.pet.species === sp ? "active" : ""} onClick={() => setSpecies(sp)}>
+                  {petSpeciesMeta[sp].emoji} {petSpeciesMeta[sp].label}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="card">
+            <h2>꾸미기 상점</h2>
+            <p>코인: {state.pet.coins}</p>
+            <div className="shopGrid">
+              {accessoryShop.map((item) => {
+                const owned = state.pet.accessoriesOwned.includes(item.id);
+                const equipped = state.pet.equippedAccessory === item.id;
+                return (
+                  <article key={item.id}>
+                    <strong>{item.name}</strong>
+                    <small>{item.price} 코인</small>
+                    {owned ? (
+                      <button className={equipped ? "active" : ""} onClick={() => equipAccessory(item.id)}>{equipped ? "장착중" : "장착"}</button>
+                    ) : (
+                      <button onClick={() => buyAccessory(item.id, item.price)} disabled={state.pet.coins < item.price}>구매</button>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        </main>
+      )}
+
       {tab === "lab" && (
         <main className="stack">
           <section className="card">
@@ -644,6 +832,7 @@ export default function App() {
               <li>D3: 실패 직후 복구 미니게임 노출</li>
               <li>D7: 모멘텀 보상(토큰 지급)</li>
               <li>D14: 자동 루틴 추천</li>
+              <li>D21: 펫 성장/꾸미기 루프 강화</li>
             </ul>
           </section>
 
@@ -653,17 +842,17 @@ export default function App() {
               <article>
                 <small>무료</small>
                 <strong>₩0</strong>
-                <p>습관 3개, 기본 통계</p>
+                <p>기본 햄스터 + 기본 코스튬</p>
               </article>
               <article className="featured">
-                <small>Pro</small>
-                <strong>₩1,900/월</strong>
-                <p>무제한 습관 + 고급 분석 + AI 코치</p>
+                <small>Pro Pet Pass</small>
+                <strong>₩3,900/월</strong>
+                <p>희귀 펫/스킨/능력 슬롯 확장</p>
               </article>
               <article>
-                <small>Challenge Pack</small>
-                <strong>₩4,900</strong>
-                <p>30일 집중 루틴팩(직장인/다이어트/공부)</p>
+                <small>랜덤 뽑기</small>
+                <strong>₩1,100</strong>
+                <p>랜덤 캐릭터/악세서리 1회</p>
               </article>
             </div>
             <button className="primary">결제 연동 준비중</button>
@@ -700,6 +889,7 @@ export default function App() {
           ["today", "오늘"],
           ["stats", "통계"],
           ["community", "도전"],
+          ["pet", "펫"],
           ["lab", "랩"],
           ["settings", "설정"],
         ].map(([id, label]) => (
@@ -708,6 +898,7 @@ export default function App() {
               {id === "today" ? <svg viewBox="0 0 24 24"><path d="M4 12.5 12 5l8 7.5" /><path d="M7 11.5V19h10v-7.5" /></svg> : null}
               {id === "stats" ? <svg viewBox="0 0 24 24"><path d="M5 19V10" /><path d="M12 19V6" /><path d="M19 19v-4" /></svg> : null}
               {id === "community" ? <svg viewBox="0 0 24 24"><path d="M7.5 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /><path d="M16.5 11a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" /><path d="M3.8 18.5c.8-2 2.2-3 3.7-3s2.9 1 3.7 3" /><path d="M12.8 18.5c.8-2 2.2-3 3.7-3s2.9 1 3.7 3" /></svg> : null}
+              {id === "pet" ? <svg viewBox="0 0 24 24"><path d="M9 12c-2.2 0-4 1.8-4 4s1.8 4 7 4 7-1.8 7-4-1.8-4-4-4" /><path d="M9 8a1.8 1.8 0 1 0 0-3.6A1.8 1.8 0 0 0 9 8Z" /><path d="M15 8a1.8 1.8 0 1 0 0-3.6A1.8 1.8 0 0 0 15 8Z" /><path d="M12 13.2c.6 0 1 .5 1 1.1 0 .7-.6 1.2-1.3 1.2-.8 0-1.3-.5-1.3-1.2 0-.6.4-1.1 1-1.1Z" /></svg> : null}
               {id === "lab" ? <svg viewBox="0 0 24 24"><path d="M9 4h6" /><path d="M10 4v4l-4.5 7.8a3 3 0 0 0 2.6 4.5h8a3 3 0 0 0 2.6-4.5L14 8V4" /><path d="M8.5 14h7" /></svg> : null}
               {id === "settings" ? <svg viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" /><path d="M19.4 15a1 1 0 0 0 .2 1.1l.1.1a1 1 0 0 1 0 1.4l-1 1a1 1 0 0 1-1.4 0l-.1-.1a1 1 0 0 0-1.1-.2 1 1 0 0 0-.6.9V20a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-.1a1 1 0 0 0-.6-.9 1 1 0 0 0-1.1.2l-.1.1a1 1 0 0 1-1.4 0l-1-1a1 1 0 0 1 0-1.4l.1-.1a1 1 0 0 0 .2-1.1 1 1 0 0 0-.9-.6H4a1 1 0 0 1-1-1v-2a1 1 0 0 1 1-1h.1a1 1 0 0 0 .9-.6 1 1 0 0 0-.2-1.1l-.1-.1a1 1 0 0 1 0-1.4l1-1a1 1 0 0 1 1.4 0l.1.1a1 1 0 0 0 1.1.2 1 1 0 0 0 .6-.9V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v.1a1 1 0 0 0 .6.9 1 1 0 0 0 1.1-.2l.1-.1a1 1 0 0 1 1.4 0l1 1a1 1 0 0 1 0 1.4l-.1.1a1 1 0 0 0-.2 1.1 1 1 0 0 0 .9.6H20a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-.1a1 1 0 0 0-.9.6Z" /></svg> : null}
             </span>

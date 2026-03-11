@@ -102,6 +102,7 @@ button, input, select { font: inherit; }
 .todayTone { background: linear-gradient(140deg, rgba(122,140,255,.25), rgba(61,83,255,.15)); }
 .statsTone { background: linear-gradient(140deg, rgba(46,230,201,.2), rgba(122,140,255,.14)); }
 .communityTone { background: linear-gradient(140deg, rgba(176,124,255,.24), rgba(122,140,255,.14)); }
+.petTone { background: linear-gradient(140deg, rgba(255,199,124,.22), rgba(255,124,207,.18)); }
 .labTone { background: linear-gradient(140deg, rgba(255,124,207,.2), rgba(131,92,255,.16)); }
 .settingsTone { background: linear-gradient(140deg, rgba(152,169,205,.2), rgba(122,140,255,.12)); }
 
@@ -111,9 +112,11 @@ h1 { margin: 2px 0; font-size: 28px; line-height: 1.15; color: #f2f5ff; }
 
 .heroGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
 }
+
+.petMini strong { color: #ffe7bf; }
 
 .heroGrid article {
   border: 1px solid #dce5f5;
@@ -250,8 +253,51 @@ h2 { margin: 0; font-size: 19px; color: #eef2ff; }
   background: #fbfcff;
 }
 
-.feedItem b { color: #273e6f; }
-.feedItem p { margin: 4px 0 0; color: #5d6f8d; font-size: 13px; }
+.feedItem b { color: #d8e2ff; }
+.feedItem p { margin: 4px 0 0; color: #b8c3df; font-size: 13px; }
+
+.petShowcase {
+  text-align: center;
+  display: grid;
+  gap: 8px;
+}
+
+.pixelPet {
+  width: 112px;
+  height: 112px;
+  margin: 0 auto;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  font-size: 56px;
+  background: linear-gradient(145deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
+  border: 1px solid rgba(255,255,255,.24);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 10px 24px rgba(15, 18, 40, .45);
+}
+
+.petActions,
+.speciesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.shopGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.shopGrid article {
+  border: 1px solid rgba(210,223,255,.25);
+  border-radius: 12px;
+  padding: 10px;
+  display: grid;
+  gap: 6px;
+  background: rgba(255,255,255,.06);
+}
+
+.shopGrid small { color: #b9c4e5; }
 
 .habitItem:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(42, 66, 117, 0.08); }
 .habitItem.done { border-color: #b9dfc7; background: #f4fcf7; }
@@ -440,7 +486,7 @@ input, select {
   bottom: calc(10px + env(safe-area-inset-bottom));
   width: min(920px, calc(100% - 16px));
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 6px;
   padding: 8px;
   background: rgba(10, 16, 34, 0.78);
@@ -552,6 +598,8 @@ input, select {
 @media (max-width: 760px) {
   .heroGrid, .kpiGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .todayGrid, .insightGrid, .trendRail { grid-template-columns: 1fr; }
+  .petActions, .speciesGrid, .shopGrid { grid-template-columns: 1fr; }
+  .bottomDock { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .paywallMock .planGrid { grid-template-columns: 1fr; }
   .sectionTop { display: grid; gap: 6px; }
   .formRow, .formRow.compact { grid-template-columns: 1fr; }
