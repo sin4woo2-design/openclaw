@@ -3,6 +3,9 @@ import { HabitCard } from "./components/habits/HabitCard";
 import { RecoveryGame } from "./components/habits/RecoveryGame";
 import { AICoach } from "./components/habits/AICoach";
 import { BottomDock, type TabId } from "./components/layout/BottomDock";
+import { TabHero } from "./components/layout/TabHero";
+import { TodayMissionCard } from "./components/today/TodayMissionCard";
+import { OnboardingCard } from "./components/onboarding/OnboardingCard";
 type HabitCategory = "건강" | "집중" | "마음" | "생활";
 type MotiveStyle = "따뜻한 코치" | "냉정한 코치" | "친구같은 응원";
 type Difficulty = "easy" | "normal" | "hard";
@@ -572,49 +575,34 @@ export default function App() {
         </div>
       </header>
 
-      <section className={`card tabHero ${tabHeader.tone}`}>
-        <p className="miniLabel">{tabHeader.eyebrow}</p>
-        <h1>{tabHeader.title}</h1>
-        <p className="sub">{tabHeader.desc}</p>
-        {tab === "today" ? (
-          <>
-            <div className="heroProgress">
-              <div className="heroProgressBar">
-                <div className="heroProgressFill" style={{ width: `${progress}%` }} />
-              </div>
-              <span className="heroProgressText">진행률 <strong>{progress}%</strong></span>
-            </div>
-            <div className="heroGrid">
-              <article><span>누적 완료</span><strong>{totalDone}회</strong></article>
-              <article><span>참여 챌린지</span><strong>{joinedCount}개</strong></article>
-              <article><span>집중 목표</span><strong>{state.focusGoal || "없음"}</strong></article>
-              <article className="petMini"><span>펫 상태</span><strong>{petMeta.emoji} Lv.{state.pet.level}</strong></article>
-            </div>
-          </>
-        ) : null}
-      </section>
+      <TabHero
+        tab={tab}
+        header={tabHeader}
+        progress={progress}
+        totalDone={totalDone}
+        joinedCount={joinedCount}
+        focusGoal={state.focusGoal}
+        petEmoji={petMeta.emoji}
+        petLevel={state.pet.level}
+      />
 
       {tab === "today" ? (
-        <section className="card missionCard">
-          <div>
-            <p className="miniLabel">TODAY MISSION</p>
-            <strong>{progress < 100 ? `${firstEasy} 먼저 체크` : "오늘 미션 클리어 🎉"}</strong>
-            <p>{motivation(state.motiveStyle, progress, state.momentumDays)}</p>
-          </div>
-          <button className="primary" onClick={() => setTab("today")}>지금 실행</button>
-        </section>
+        <TodayMissionCard
+          progress={progress}
+          firstEasy={firstEasy}
+          motivationText={motivation(state.motiveStyle, progress, state.momentumDays)}
+          onRunNow={() => setTab("today")}
+        />
       ) : null}
 
       {!state.onboardingDone ? (
-        <section className="card onboardingCard">
-          <h2>1분 온보딩</h2>
-          <p>맞춤 동기부여를 위해 기본 정보만 입력해요.</p>
-          <div className="formRow compact">
-            <input value={onboardingName} onChange={(e) => setOnboardingName(e.target.value)} placeholder="이름 또는 닉네임" />
-            <input value={onboardingGoal} onChange={(e) => setOnboardingGoal(e.target.value)} placeholder="이번 주 핵심 목표 (예: 체중 -1kg)" />
-          </div>
-          <div className="centerAction"><button className="primary" onClick={completeOnboarding}>시작하기</button></div>
-        </section>
+        <OnboardingCard
+          name={onboardingName}
+          goal={onboardingGoal}
+          onChangeName={setOnboardingName}
+          onChangeGoal={setOnboardingGoal}
+          onComplete={completeOnboarding}
+        />
       ) : null}
 
       <div key={tab} className="tabStage">
