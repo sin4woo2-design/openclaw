@@ -253,22 +253,26 @@ export default function App() {
 
     const successfulDay = total > 0 && completed / total >= 0.5;
 
-    setState((prev) => ({
-      ...prev,
-      lastOpenedDate: today,
-      dayLogs: [daily, ...prev.dayLogs].slice(0, 60),
-      momentumDays: successfulDay ? prev.momentumDays + 1 : 0,
-      freezeTokens: successfulDay && (prev.momentumDays + 1) % 7 === 0 ? prev.freezeTokens + 1 : prev.freezeTokens,
-      habits: prev.habits.map((h) => ({ ...h, todayDone: false })),
-      pet: {
-        ...prev.pet,
-        mood: Math.max(20, prev.pet.mood - 8),
-        failShield: prev.pet.species === "golden-hamster" ? 1 : prev.pet.failShield,
-      },
-    }));
+    const rollover = window.setTimeout(() => {
+      setState((prev) => ({
+        ...prev,
+        lastOpenedDate: today,
+        dayLogs: [daily, ...prev.dayLogs].slice(0, 60),
+        momentumDays: successfulDay ? prev.momentumDays + 1 : 0,
+        freezeTokens: successfulDay && (prev.momentumDays + 1) % 7 === 0 ? prev.freezeTokens + 1 : prev.freezeTokens,
+        habits: prev.habits.map((h) => ({ ...h, todayDone: false })),
+        pet: {
+          ...prev.pet,
+          mood: Math.max(20, prev.pet.mood - 8),
+          failShield: prev.pet.species === "golden-hamster" ? 1 : prev.pet.failShield,
+        },
+      }));
 
-    setNote("");
-    setMood("보통");
+      setNote("");
+      setMood("보통");
+    }, 0);
+
+    return () => clearTimeout(rollover);
   }, [state.lastOpenedDate, state.habits, mood, note]);
 
   const activeHabits = useMemo(
