@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { HabitCard } from "./components/habits/HabitCard";
-import { RecoveryGame } from "./components/habits/RecoveryGame";
-import { AICoach } from "./components/habits/AICoach";
 import { BottomDock, type TabId } from "./components/layout/BottomDock";
 import { TabHero } from "./components/layout/TabHero";
 import { TodayMissionCard } from "./components/today/TodayMissionCard";
 import { OnboardingCard } from "./components/onboarding/OnboardingCard";
+import { TodayTab } from "./components/tabs/TodayTab";
+import { StatsTab } from "./components/tabs/StatsTab";
+import { CommunityTab } from "./components/tabs/CommunityTab";
 type HabitCategory = "건강" | "집중" | "마음" | "생활";
 type MotiveStyle = "따뜻한 코치" | "냉정한 코치" | "친구같은 응원";
 type Difficulty = "easy" | "normal" | "hard";
@@ -607,159 +607,66 @@ export default function App() {
 
       <div key={tab} className="tabStage">
       {tab === "today" && (
-        <main className="stack">
-          <section className="todayGrid">
-            <section className="card">
-              <div className="titleRow"><h2>오늘 해야 할 습관</h2><span>{doneToday}/{activeHabits.length}</span></div>
-              <div className="habitList">
-                {activeHabits.length === 0 ? (
-                  <article className="emptyState">
-                    <strong>오늘 활성 습관이 없어요</strong>
-                    <p>아래에서 습관을 추가하거나 템플릿을 선택해 시작해보세요.</p>
-                  </article>
-                ) : null}
-                {activeHabits.map((h, i) => {
-                  const colors: ("mint" | "purple" | "orange" | "blue")[] = ["mint", "purple", "orange", "blue"];
-                  const theme = colors[i % colors.length];
-                  return (
-                    <HabitCard 
-                      key={h.id} 
-                      habit={h} 
-                      colorTheme={theme} 
-                      onComplete={doHabit} 
-                      onFail={failHabit} 
-                      onRecover={recoverByToken} 
-                    />
-                  );
-                })}
-              </div>
-            </section>
-
-            <section className="card">
-              <h2>습관 빠르게 추가</h2>
-              <div className="formRow">
-                <input placeholder="예: 10분 스트레칭" value={newHabitName} onChange={(e) => setNewHabitName(e.target.value)} />
-                <select value={newCategory} onChange={(e) => setNewCategory(e.target.value as HabitCategory)}>
-                  <option>건강</option><option>집중</option><option>마음</option><option>생활</option>
-                </select>
-                <select value={newDifficulty} onChange={(e) => setNewDifficulty(e.target.value as Difficulty)}>
-                  <option value="easy">easy</option><option value="normal">normal</option><option value="hard">hard</option>
-                </select>
-                <button className="primary" onClick={addHabit}>추가</button>
-              </div>
-              <div className="chips">
-                {templates.map((t) => <button key={t.name} className="chip" onClick={() => addTemplate(t)}>{t.name}</button>)}
-              </div>
-            </section>
-          </section>
-
-          {game && (
-            <RecoveryGame 
-              game={game}
-              onSuccess={() => {
-                setState((prev) => ({
-                  ...prev,
-                  levelPoint: prev.levelPoint + 15,
-                  habits: prev.habits.map((h) => (h.id === game.habitId ? { ...h, todayDone: true, streak: h.streak + 1, totalDone: h.totalDone + 1 } : h)),
-                }));
-                setGame(null);
-                setToast("복구 성공! ❄️방어 완료 +15XP");
-              }}
-              onFail={() => {
-                setGame(null);
-                setMessage("복구 실패. 아쉽지만 꺾인 마음을 다시 잡아봐요.");
-              }}
-            />
-          )}
-
-          <AICoach 
-            message={message}
-            motiveStyle={state.motiveStyle}
-            mood={mood}
-            setMood={setMood}
-            note={note}
-            setNote={setNote}
-          />
-        </main>
+        <TodayTab
+          doneToday={doneToday}
+          activeHabits={activeHabits}
+          newHabitName={newHabitName}
+          setNewHabitName={setNewHabitName}
+          newCategory={newCategory}
+          setNewCategory={setNewCategory}
+          newDifficulty={newDifficulty}
+          setNewDifficulty={setNewDifficulty}
+          addHabit={addHabit}
+          templates={templates}
+          addTemplate={addTemplate}
+          doHabit={doHabit}
+          failHabit={failHabit}
+          recoverByToken={recoverByToken}
+          game={game}
+          onRecoverSuccess={() => {
+            if (!game) return;
+            setState((prev) => ({
+              ...prev,
+              levelPoint: prev.levelPoint + 15,
+              habits: prev.habits.map((h) => (h.id === game.habitId ? { ...h, todayDone: true, streak: h.streak + 1, totalDone: h.totalDone + 1 } : h)),
+            }));
+            setGame(null);
+            setToast("복구 성공! ❄️방어 완료 +15XP");
+          }}
+          onRecoverFail={() => {
+            setGame(null);
+            setMessage("복구 실패. 아쉽지만 꺾인 마음을 다시 잡아봐요.");
+          }}
+          message={message}
+          motiveStyle={state.motiveStyle}
+          mood={mood}
+          setMood={setMood}
+          note={note}
+          setNote={setNote}
+        />
       )}
 
       {tab === "stats" && (
-        <main className="stack">
-          <section className="kpiGrid">
-            <article className="card statCard"><span>평균 스트릭</span><strong>{avgStreak}일</strong></article>
-            <article className="card statCard"><span>누적 완료</span><strong>{totalDone}회</strong></article>
-            <article className="card statCard"><span>최강 습관</span><strong>{topHabit ? topHabit.name : "-"}</strong></article>
-          </section>
-
-          <section className="card">
-            <div className="sectionTop">
-              <h2>요일별 성공률</h2>
-              <div className="rangeChips">
-                {(["7d", "14d", "30d"] as const).map((r) => (
-                  <button key={r} className={statsRange === r ? "active" : ""} onClick={() => setStatsRange(r)}>{r}</button>
-                ))}
-              </div>
-            </div>
-            <div className="chart">
-              {weekBars.map((b) => (
-                <div key={b.day} className="barWrap"><i style={{ height: `${Math.max(14, b.val * 1.4)}px` }} /><strong>{b.val}%</strong><span>{b.day}</span></div>
-              ))}
-            </div>
-          </section>
-
-          <section className="card trendRail">
-            <article><small>리듬 안정도</small><strong>{Math.max(0, Math.min(100, Math.round((bestDay?.val ?? 0) - (weakDay?.val ?? 0) + 55)))}점</strong></article>
-            <article><small>성장 여지</small><strong>{Math.max(0, 100 - (bestDay?.val ?? 0))}%</strong></article>
-            <article><small>추천 루틴</small><strong>{(weakDay?.val ?? 0) < 40 ? "2분 습관" : "난이도 상향"}</strong></article>
-          </section>
-
-          <section className="card insightGrid">
-            <article>
-              <small>강점 요일</small>
-              <strong>{bestDay?.day ?? "-"}요일</strong>
-              <p>{bestDay?.val ?? 0}%로 가장 높아요. 이 날엔 hard 습관을 배치하세요.</p>
-            </article>
-            <article>
-              <small>보완 요일</small>
-              <strong>{weakDay?.day ?? "-"}요일</strong>
-              <p>{weakDay?.val ?? 0}%로 낮아요. 2분 습관부터 시작해 실패를 줄이세요.</p>
-            </article>
-          </section>
-        </main>
+        <StatsTab
+          avgStreak={avgStreak}
+          totalDone={totalDone}
+          topHabitName={topHabit?.name}
+          statsRange={statsRange}
+          setStatsRange={setStatsRange}
+          weekBars={weekBars}
+          bestDay={bestDay}
+          weakDay={weakDay}
+        />
       )}
 
       {tab === "community" && (
-        <main className="stack">
-          <section className="card">
-            <h2>챌린지</h2>
-            <div className="challengeList">
-              {state.challenges.map((c) => (
-                <article key={c.id} className="challengeItem premiumChallenge">
-                  <div>
-                    <div className="challengeTopRow">
-                      <strong>{c.title}</strong>
-                      <span>{c.days}D</span>
-                    </div>
-                    <p>{c.description}</p>
-                    <small>{c.participants}명 참여 · 이번 주 완주율 예상 {Math.min(92, 48 + c.participants % 44)}%</small>
-                    <div className="tagRow">{c.tags.map((t) => <em key={t}>#{t}</em>)}</div>
-                  </div>
-                  <button className={c.joined ? "active" : ""} onClick={() => setState((prev) => ({
-                    ...prev,
-                    challenges: prev.challenges.map((x) => x.id === c.id ? { ...x, joined: !x.joined, participants: x.joined ? x.participants - 1 : x.participants + 1 } : x),
-                  }))}>{c.joined ? "참여중" : "같이 도전"}</button>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="card communityFeed">
-            <h2>실시간 피드</h2>
-            <div className="feedItem"><b>민지</b><p>아침 스트레칭 12일째 · "출근 전에 2분만!"</p></div>
-            <div className="feedItem"><b>준호</b><p>독서 15분 9일째 · "점심 후가 가장 잘됨"</p></div>
-            <div className="feedItem"><b>유나</b><p>물 8잔 20일째 · "컵을 눈에 보이게 두니까 성공"</p></div>
-          </section>
-        </main>
+        <CommunityTab
+          challenges={state.challenges}
+          onToggleChallenge={(challengeId) => setState((prev) => ({
+            ...prev,
+            challenges: prev.challenges.map((x) => x.id === challengeId ? { ...x, joined: !x.joined, participants: x.joined ? x.participants - 1 : x.participants + 1 } : x),
+          }))}
+        />
       )}
 
       {tab === "pet" && (
