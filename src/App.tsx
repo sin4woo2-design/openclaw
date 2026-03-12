@@ -785,7 +785,7 @@ export default function App() {
         <main className="stack">
           <section className="card petShowcase">
             <button className={`pixelPet petImageWrap ${petMotion ? "active" : ""}`} onClick={() => setPetMotion(true)}>
-              <img className="petImage" src="/pets/hamster-base.png" alt={`${petMeta.label} 캐릭터`} />
+              <div className="petImageSprite" aria-label={`${petMeta.label} 캐릭터`} />
               <small>{petMeta.emoji}</small>
             </button>
             <h2>{state.pet.name}</h2>
