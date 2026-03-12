@@ -216,6 +216,7 @@ export default function App() {
   const [onboardingGoal, setOnboardingGoal] = useState(state.focusGoal || "");
   const [statsRange, setStatsRange] = useState<"7d" | "14d" | "30d">("14d");
   const [burst, setBurst] = useState(false);
+  const [petMotion, setPetMotion] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -232,6 +233,12 @@ export default function App() {
     const t = window.setTimeout(() => setBurst(false), 700);
     return () => clearTimeout(t);
   }, [burst]);
+
+  useEffect(() => {
+    if (!petMotion) return;
+    const t = window.setTimeout(() => setPetMotion(false), 520);
+    return () => clearTimeout(t);
+  }, [petMotion]);
 
   useEffect(() => {
     const today = nowDate();
@@ -777,10 +784,10 @@ export default function App() {
       {tab === "pet" && (
         <main className="stack">
           <section className="card petShowcase">
-            <div className={`pixelPet ${state.pet.species}`}>
-              <div className="petSpriteSheet" aria-hidden />
+            <button className={`pixelPet petImageWrap ${petMotion ? "active" : ""}`} onClick={() => setPetMotion(true)}>
+              <img className="petImage" src="/pets/hamster-base.png" alt={`${petMeta.label} 캐릭터`} />
               <small>{petMeta.emoji}</small>
-            </div>
+            </button>
             <h2>{state.pet.name}</h2>
             <p>Lv.{state.pet.level} · XP {state.pet.xp}/100 · 무드 {state.pet.mood}%</p>
             <div className="petActions">
