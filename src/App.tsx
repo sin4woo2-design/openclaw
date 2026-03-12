@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-
+import { HabitCard } from "./components/habits/HabitCard";
+import { RecoveryGame } from "./components/habits/RecoveryGame";
+import { AICoach } from "./components/habits/AICoach";
 type HabitCategory = "건강" | "집중" | "마음" | "생활";
 type MotiveStyle = "따뜻한 코치" | "냉정한 코치" | "친구같은 응원";
 type Difficulty = "easy" | "normal" | "hard";
@@ -77,11 +79,6 @@ const nowDate = () => new Date().toISOString().slice(0, 10);
 const todayWeekday = () => new Date().getDay();
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-const difficultyLabel: Record<Difficulty, string> = {
-  easy: "가벼움",
-  normal: "표준",
-  hard: "집중",
-};
 
 const templates: Array<Pick<Habit, "name" | "category" | "difficulty">> = [
   { name: "아침 물 1잔", category: "건강", difficulty: "easy" },
@@ -395,27 +392,7 @@ export default function App() {
     setToast("방어 성공");
   };
 
-  const playGame = (n: number) => {
-    if (!game) return;
-    if (n === game.target) {
-      setState((prev) => ({
-        ...prev,
-        levelPoint: prev.levelPoint + 10,
-        habits: prev.habits.map((h) => (h.id === game.habitId ? { ...h, todayDone: true, streak: h.streak + 1 } : h)),
-      }));
-      setGame(null);
-      setToast("복구 성공 +10XP");
-      return;
-    }
 
-    if (game.triesLeft <= 1) {
-      setGame(null);
-      setMessage("이번엔 실패. 내일 다시 시작하면 된다.");
-      return;
-    }
-
-    setGame({ ...game, triesLeft: game.triesLeft - 1 });
-  };
 
   const addHabit = () => {
     const name = newHabitName.trim();
@@ -595,13 +572,20 @@ export default function App() {
         <h1>{tabHeader.title}</h1>
         <p className="sub">{tabHeader.desc}</p>
         {tab === "today" ? (
-          <div className="heroGrid">
-            <article><span>오늘 진행률</span><strong>{progress}%</strong></article>
-            <article><span>누적 완료</span><strong>{totalDone}회</strong></article>
-            <article><span>참여 챌린지</span><strong>{joinedCount}개</strong></article>
-            <article><span>집중 목표</span><strong>{state.focusGoal || "설정 필요"}</strong></article>
-            <article className="petMini"><span>펫 상태</span><strong>{petMeta.emoji} Lv.{state.pet.level}</strong></article>
-          </div>
+          <>
+            <div className="heroProgress">
+              <div className="heroProgressBar">
+                <div className="heroProgressFill" style={{ width: `${progress}%` }} />
+              </div>
+              <span className="heroProgressText">진행률 <strong>{progress}%</strong></span>
+            </div>
+            <div className="heroGrid">
+              <article><span>누적 완료</span><strong>{totalDone}회</strong></article>
+              <article><span>참여 챌린지</span><strong>{joinedCount}개</strong></article>
+              <article><span>집중 목표</span><strong>{state.focusGoal || "없음"}</strong></article>
+              <article className="petMini"><span>펫 상태</span><strong>{petMeta.emoji} Lv.{state.pet.level}</strong></article>
+            </div>
+          </>
         ) : null}
       </section>
 
@@ -641,22 +625,20 @@ export default function App() {
                     <p>아래에서 습관을 추가하거나 템플릿을 선택해 시작해보세요.</p>
                   </article>
                 ) : null}
-                {activeHabits.map((h) => (
-                  <article key={h.id} className={`habitItem ${h.todayDone ? "done" : ""}`}>
-                    <div>
-                      <div className="habitTitleRow">
-                        <strong>{h.name}</strong>
-                        <span className="difficultyPill">{difficultyLabel[h.difficulty]}</span>
-                      </div>
-                      <p>{h.category} · 연속 {h.streak}일 · 최고 {h.bestStreak}일</p>
-                    </div>
-                    <div className="actions">
-                      <button className="primary" onClick={() => doHabit(h.id)}>{h.todayDone ? "체크 취소" : "완료 체크"}</button>
-                      <button onClick={() => failHabit(h.id)}>실패</button>
-                      <button className="soft" onClick={() => recoverByToken(h.id)}>토큰 방어</button>
-                    </div>
-                  </article>
-                ))}
+                {activeHabits.map((h, i) => {
+                  const colors: ("mint" | "purple" | "orange" | "blue")[] = ["mint", "purple", "orange", "blue"];
+                  const theme = colors[i % colors.length];
+                  return (
+                    <HabitCard 
+                      key={h.id} 
+                      habit={h} 
+                      colorTheme={theme} 
+                      onComplete={doHabit} 
+                      onFail={failHabit} 
+                      onRecover={recoverByToken} 
+                    />
+                  );
+                })}
               </div>
             </section>
 
@@ -679,26 +661,32 @@ export default function App() {
           </section>
 
           {game && (
-            <section className="card game">
-              <h2>복구 미니게임</h2>
-              <p>1~10 숫자를 맞추면 스트릭 복구</p>
-              <div className="grid10">
-                {Array.from({ length: 10 }).map((_, i) => <button key={i} onClick={() => playGame(i + 1)}>{i + 1}</button>)}
-              </div>
-              <small>남은 기회 {game.triesLeft}회</small>
-            </section>
+            <RecoveryGame 
+              game={game}
+              onSuccess={() => {
+                setState((prev) => ({
+                  ...prev,
+                  levelPoint: prev.levelPoint + 15,
+                  habits: prev.habits.map((h) => (h.id === game.habitId ? { ...h, todayDone: true, streak: h.streak + 1, totalDone: h.totalDone + 1 } : h)),
+                }));
+                setGame(null);
+                setToast("복구 성공! ❄️방어 완료 +15XP");
+              }}
+              onFail={() => {
+                setGame(null);
+                setMessage("복구 실패. 아쉽지만 꺾인 마음을 다시 잡아봐요.");
+              }}
+            />
           )}
 
-          <section className="card">
-            <h2>오늘 회고</h2>
-            <div className="formRow compact">
-              <select value={mood} onChange={(e) => setMood(e.target.value as DayLog["mood"])}>
-                <option>최고</option><option>좋음</option><option>보통</option><option>저조</option>
-              </select>
-              <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="오늘 잘 된 한 가지" />
-            </div>
-          </section>
-          <p className="message">{message}</p>
+          <AICoach 
+            message={message}
+            motiveStyle={state.motiveStyle}
+            mood={mood}
+            setMood={setMood}
+            note={note}
+            setNote={setNote}
+          />
         </main>
       )}
 
