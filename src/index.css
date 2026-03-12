@@ -292,18 +292,18 @@ h2 { margin: 0; font-size: 19px; color: #eef2ff; }
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,.28);
   box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 10px 24px rgba(15, 18, 40, .45);
-  image-rendering: pixelated;
+  image-rendering: auto;
   background:
     linear-gradient(145deg, rgba(255,255,255,.12), rgba(255,255,255,.05)),
-    url('/pets/hamster-emote-sheet.png');
-  background-size: cover, 384px 32px;
+    url('/pets/hamster-base.png');
+  background-size: cover, contain;
   background-repeat: no-repeat, no-repeat;
-  background-position: center, 0 0;
-  animation: petBob 1.9s ease-in-out infinite, petEmote 1.25s steps(12) infinite;
+  background-position: center, center;
+  animation: petBob 1.9s ease-in-out infinite;
 }
 
 .petImageWrap.active .petImageSprite {
-  animation: petTap .5s ease, petEmote .9s steps(12) infinite;
+  animation: petTap .5s ease;
 }
 
 .petActions,
