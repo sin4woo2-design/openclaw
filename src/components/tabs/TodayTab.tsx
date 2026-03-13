@@ -1,32 +1,9 @@
 import { HabitCard } from "../habits/HabitCard";
 import { RecoveryGame } from "../habits/RecoveryGame";
 import { AICoach } from "../habits/AICoach";
+import type { DayLog, Difficulty, Habit, HabitCategory, MotiveStyle, RecoveryGame as RecoveryGameState } from "../../types";
 
-type HabitCategory = "건강" | "집중" | "마음" | "생활";
-type Difficulty = "easy" | "normal" | "hard";
-type Mood = "최고" | "좋음" | "보통" | "저조";
-type MotiveStyle = "따뜻한 코치" | "냉정한 코치" | "친구같은 응원";
-
-type Habit = {
-  id: string;
-  name: string;
-  category: HabitCategory;
-  difficulty: Difficulty;
-  streak: number;
-  bestStreak: number;
-  totalDone: number;
-  todayDone: boolean;
-  weeklyTarget: number;
-  activeDays: number[];
-  createdAt: string;
-  lastDoneAt?: string;
-};
-
-type RecoveryGameState = {
-  habitId: string;
-  target: number;
-  triesLeft: number;
-};
+type Mood = DayLog["mood"];
 
 type TodayTabProps = {
   doneToday: number;

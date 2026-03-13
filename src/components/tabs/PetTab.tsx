@@ -1,16 +1,4 @@
-type PetSpecies = "golden-hamster" | "campbell" | "capybara";
-
-type PetState = {
-  species: PetSpecies;
-  name: string;
-  level: number;
-  xp: number;
-  mood: number;
-  coins: number;
-  failShield: number;
-  accessoriesOwned: string[];
-  equippedAccessory: string;
-};
+import type { PetSpecies, PetState } from "../../types";
 
 type ShopItem = { id: string; name: string; price: number };
 

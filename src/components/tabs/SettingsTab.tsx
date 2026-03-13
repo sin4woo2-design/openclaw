@@ -1,4 +1,4 @@
-type MotiveStyle = "따뜻한 코치" | "냉정한 코치" | "친구같은 응원";
+import type { MotiveStyle } from "../../types";
 
 type SettingsTabProps = {
   motiveStyle: MotiveStyle;

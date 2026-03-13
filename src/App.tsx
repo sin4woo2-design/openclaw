@@ -9,77 +9,16 @@ import { CommunityTab } from "./components/tabs/CommunityTab";
 import { PetTab } from "./components/tabs/PetTab";
 import { LabTab } from "./components/tabs/LabTab";
 import { SettingsTab } from "./components/tabs/SettingsTab";
-type HabitCategory = "건강" | "집중" | "마음" | "생활";
-type MotiveStyle = "따뜻한 코치" | "냉정한 코치" | "친구같은 응원";
-type Difficulty = "easy" | "normal" | "hard";
-
-type Habit = {
-  id: string;
-  name: string;
-  category: HabitCategory;
-  difficulty: Difficulty;
-  streak: number;
-  bestStreak: number;
-  totalDone: number;
-  todayDone: boolean;
-  weeklyTarget: number;
-  activeDays: number[];
-  createdAt: string;
-  lastDoneAt?: string;
-};
-
-type Challenge = {
-  id: string;
-  title: string;
-  description: string;
-  days: number;
-  participants: number;
-  joined: boolean;
-  tags: string[];
-};
-
-type DayLog = {
-  date: string;
-  doneCount: number;
-  totalCount: number;
-  mood: "최고" | "좋음" | "보통" | "저조";
-  note: string;
-};
-
-type RecoveryGame = {
-  habitId: string;
-  target: number;
-  triesLeft: number;
-};
-
-type PetSpecies = "golden-hamster" | "campbell" | "capybara";
-
-type PetState = {
-  species: PetSpecies;
-  name: string;
-  level: number;
-  xp: number;
-  mood: number;
-  coins: number;
-  failShield: number;
-  accessoriesOwned: string[];
-  equippedAccessory: string;
-};
-
-type AppState = {
-  habits: Habit[];
-  challenges: Challenge[];
-  motiveStyle: MotiveStyle;
-  freezeTokens: number;
-  levelPoint: number;
-  dayLogs: DayLog[];
-  lastOpenedDate: string;
-  momentumDays: number;
-  onboardingDone: boolean;
-  userName: string;
-  focusGoal: string;
-  pet: PetState;
-};
+import type {
+  AppState,
+  DayLog,
+  Difficulty,
+  Habit,
+  HabitCategory,
+  MotiveStyle,
+  PetSpecies,
+  RecoveryGame,
+} from "./types";
 
 const STORAGE_KEY = "start-is-half-v4";
 const nowDate = () => new Date().toISOString().slice(0, 10);

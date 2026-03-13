@@ -1,12 +1,4 @@
-type Challenge = {
-  id: string;
-  title: string;
-  description: string;
-  days: number;
-  participants: number;
-  joined: boolean;
-  tags: string[];
-};
+import type { Challenge } from "../../types";
 
 type CommunityTabProps = {
   challenges: Challenge[];
