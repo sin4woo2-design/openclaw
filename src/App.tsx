@@ -6,6 +6,9 @@ import { OnboardingCard } from "./components/onboarding/OnboardingCard";
 import { TodayTab } from "./components/tabs/TodayTab";
 import { StatsTab } from "./components/tabs/StatsTab";
 import { CommunityTab } from "./components/tabs/CommunityTab";
+import { PetTab } from "./components/tabs/PetTab";
+import { LabTab } from "./components/tabs/LabTab";
+import { SettingsTab } from "./components/tabs/SettingsTab";
 type HabitCategory = "건강" | "집중" | "마음" | "생활";
 type MotiveStyle = "따뜻한 코치" | "냉정한 코치" | "친구같은 응원";
 type Difficulty = "easy" | "normal" | "hard";
@@ -670,113 +673,31 @@ export default function App() {
       )}
 
       {tab === "pet" && (
-        <main className="stack">
-          <section className="card petShowcase">
-            <button className={`pixelPet petImageWrap ${petMotion ? "active" : ""}`} onClick={() => setPetMotion(true)}>
-              <div className="petImageSprite" aria-label={`${petMeta.label} 캐릭터`} />
-              <small>{petMeta.emoji}</small>
-            </button>
-            <h2>{state.pet.name}</h2>
-            <p>Lv.{state.pet.level} · XP {state.pet.xp}/100 · 무드 {state.pet.mood}%</p>
-            <div className="petActions">
-              <button onClick={() => petInteract("feed")}>간식 주기</button>
-              <button onClick={() => petInteract("pet")}>쓰다듬기</button>
-              <button onClick={() => petInteract("play")}>놀아주기</button>
-            </div>
-            <small>특수 능력: {petMeta.ability}</small>
-          </section>
-
-          <section className="card">
-            <h2>종류 선택</h2>
-            <div className="speciesGrid">
-              {(Object.keys(petSpeciesMeta) as PetSpecies[]).map((sp) => (
-                <button key={sp} className={state.pet.species === sp ? "active" : ""} onClick={() => setSpecies(sp)}>
-                  {petSpeciesMeta[sp].emoji} {petSpeciesMeta[sp].label}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <section className="card">
-            <h2>꾸미기 상점</h2>
-            <p>코인: {state.pet.coins}</p>
-            <div className="shopGrid">
-              {accessoryShop.map((item) => {
-                const owned = state.pet.accessoriesOwned.includes(item.id);
-                const equipped = state.pet.equippedAccessory === item.id;
-                return (
-                  <article key={item.id}>
-                    <strong>{item.name}</strong>
-                    <small>{item.price} 코인</small>
-                    {owned ? (
-                      <button className={equipped ? "active" : ""} onClick={() => equipAccessory(item.id)}>{equipped ? "장착중" : "장착"}</button>
-                    ) : (
-                      <button onClick={() => buyAccessory(item.id, item.price)} disabled={state.pet.coins < item.price}>구매</button>
-                    )}
-                  </article>
-                );
-              })}
-            </div>
-          </section>
-        </main>
+        <PetTab
+          petMotion={petMotion}
+          onMotion={() => setPetMotion(true)}
+          petMeta={petMeta}
+          pet={state.pet}
+          petSpeciesMeta={petSpeciesMeta}
+          accessoryShop={accessoryShop}
+          setSpecies={setSpecies}
+          petInteract={petInteract}
+          equipAccessory={equipAccessory}
+          buyAccessory={buyAccessory}
+        />
       )}
 
-      {tab === "lab" && (
-        <main className="stack">
-          <section className="card">
-            <h2>리텐션 설계</h2>
-            <ul>
-              <li>D1: 첫 체크 3분 이내</li>
-              <li>D3: 실패 직후 복구 미니게임 노출</li>
-              <li>D7: 모멘텀 보상(토큰 지급)</li>
-              <li>D14: 자동 루틴 추천</li>
-              <li>D21: 펫 성장/꾸미기 루프 강화</li>
-            </ul>
-          </section>
-
-          <section className="card paywallMock">
-            <h2>프리미엄 목업 (결제 연결 전)</h2>
-            <div className="planGrid">
-              <article>
-                <small>무료</small>
-                <strong>₩0</strong>
-                <p>기본 햄스터 + 기본 코스튬</p>
-              </article>
-              <article className="featured">
-                <small>Pro Pet Pass</small>
-                <strong>₩3,900/월</strong>
-                <p>희귀 펫/스킨/능력 슬롯 확장</p>
-              </article>
-              <article>
-                <small>랜덤 뽑기</small>
-                <strong>₩1,100</strong>
-                <p>랜덤 캐릭터/악세서리 1회</p>
-              </article>
-            </div>
-            <button className="primary">결제 연동 준비중</button>
-          </section>
-        </main>
-      )}
+      {tab === "lab" && <LabTab />}
 
       {tab === "settings" && (
-        <main className="stack">
-          <section className="card">
-            <h2>동기부여 톤</h2>
-            <div className="chips">
-              {(["따뜻한 코치", "냉정한 코치", "친구같은 응원"] as MotiveStyle[]).map((t) => (
-                <button key={t} className={`chip ${state.motiveStyle === t ? "selected" : ""}`} onClick={() => setState((prev) => ({ ...prev, motiveStyle: t }))}>{t}</button>
-              ))}
-            </div>
-          </section>
-
-          <section className="card">
-            <h2>데이터 초기화</h2>
-            <button onClick={() => {
-              if (!confirm("전체 데이터를 초기화할까요?")) return;
-              setState(initialState);
-            }}>초기화</button>
-          </section>
-        </main>
+        <SettingsTab
+          motiveStyle={state.motiveStyle}
+          setMotiveStyle={(style) => setState((prev) => ({ ...prev, motiveStyle: style }))}
+          onReset={() => {
+            if (!confirm("전체 데이터를 초기화할까요?")) return;
+            setState(initialState);
+          }}
+        />
       )}
       </div>
 
